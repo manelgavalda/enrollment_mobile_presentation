@@ -25,13 +25,13 @@
 		<div class="reveal">
 			<div class="slides">
 				<section>
-					<h1>Presentació Mòdul Enrollment Mobile</h1>
+					<h1>Enrollment Mobile</h1>
 					<h3>Autor: Manel Gavaldà Andreu</h3>
 				</section>
 
 				<section>
 					<h1>Presentació</h1>
-					<p>Aquest projecte consisteix amb una aplicació mòbil utilitzada per crear, editar, eliminar i validar matrícules d'alumnes.</p>
+					<p>Aquest projecte consisteix amb una aplicació mòbil utilitzada per crear, editar, eliminar matrícules d'alumnes. Amb una part web d'aministració de matricules on les pots modificar i validar.</p>
 				</section>
 
 				<section>
@@ -61,6 +61,47 @@
 							<li><a href="https://play.google.com/store/apps/details?id=io.todosVue">Google Play Application</a></li>
 						</ul>
 					</ul>
+				</section>
+
+				<section>
+					<h1>Exemple validació de matrícula</h1>
+					<p></p>
+				</section>
+
+				<section>
+					<section>
+						<h1>Arquitectura del projecte</h1>
+						<p></p>
+					</section>
+					<section data-background="images/packagist.png">
+						<h1 style="color:black;">Paquet Composer</h1>
+						<pre style="font-size: 30px"><code class="hljs" style="background-color: black">
+Component principal del projecte que conté
+tot el codi necessari i les migracions
+per al funcionament,
+tant de la part d'administració(web),
+com per la part d'usuari(mòbil).
+						</code></pre>
+					</section>
+					<section data-background="images/test.png">
+						<h1 style="color:black;">Pàgina Administració</h1>
+						<pre style="font-size: 30px"><code class="hljs" style="background-color: black">
+Component del projecte amb l'estructura laravel
+necessaria per comprovar el bon funcionament
+del paquet i adminitrar les matrícules.
+Utilitza la plantilla adminlte amb el projecte
+adminlte/laravel.
+						</code></pre>
+					</section>
+					<section data-background="images/mobile.png">
+						<h1 style="color:black;">Aplicació Mobile</h1>
+						<pre style="font-size: 30px"><code class="hljs" style="background-color: black">
+Aplicació feta amb Vue i Cordova utilitzada
+pels usuaris per crear les seves matrícules.
+Utilitza la plantilla Vue Material amb
+components Vuetify.
+						</code></pre>
+					</section>
 				</section>
 			</div>
 		</div>
