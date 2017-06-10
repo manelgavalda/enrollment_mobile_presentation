@@ -74,7 +74,7 @@
 						<p></p>
 					</section>
 					<section data-background="images/packagist.png">
-						<h1 style="color:black;">Paquet Composer</h1>
+						<h3 style="color:black;">Paquet Composer</h3>
 						<pre style="font-size: 30px"><code class="hljs" style="background-color: black">
 Component principal del projecte que conté
 tot el codi necessari i les migracions
@@ -84,7 +84,7 @@ com per la part d'usuari(mòbil).
 						</code></pre>
 					</section>
 					<section data-background="images/test.png">
-						<h1 style="color:black;">Pàgina Administració</h1>
+						<h3 style="color:black;">Pàgina Administració</h3>
 						<pre style="font-size: 30px"><code class="hljs" style="background-color: black">
 Component del projecte amb l'estructura laravel
 necessaria per comprovar el bon funcionament
@@ -94,13 +94,67 @@ adminlte/laravel.
 						</code></pre>
 					</section>
 					<section data-background="images/mobile.png">
-						<h1 style="color:black;">Aplicació Mobile</h1>
+						<h3 style="color:black;">Aplicació Mobile</h3>
 						<pre style="font-size: 30px"><code class="hljs" style="background-color: black">
 Aplicació feta amb Vue i Cordova utilitzada
 pels usuaris per crear les seves matrícules.
 Utilitza la plantilla Vue Material amb
 components Vuetify.
 						</code></pre>
+					</section>
+				</section>
+				<section>
+					<section>
+						<h1>Arquitectura de l'API</h1>
+						<p>Utilitza una API REST treballant amb format JSON
+							i funcionant sobre un projecte Laravel, on envies peticions
+							mitjançant un client http (en el meu cas axios) sobre el controlador
+							de l'apl·licació i el control·lador et retorna la resposta de l'operació
+							realitzada.</p>
+
+					</section>
+					<section data-state="customevent">
+						<h3>Exemple de petició feta amb Axios sobre el controlador de enrollments per retornar-los.</h3>
+						<pre><code class="javascript" data-trim contenteditable style="font-size: 18px;">
+ getEnrollments () {
+      window.axios.get('/api/v1/enrollments')
+        .then((response) => {
+          this.enrollments = response.data.data
+          console.log('Enrollments')
+          console.log(response.data.data)
+        }, (err) => {
+          console.log(err)
+        })
+    },
+					</code></pre>
+						<ul>
+							<li>Petició amb l'objecte Axios( el necessitem instanciar al projecte).</li>
+							<li>Guardem la data en una variable dins de data que li diem courses. Que és troba dins data.data de la petició</li>
+						</ul>
+					</section>
+					<section>
+						<h3>Codi Control·lador</h3>
+						<pre><code class="javascript" data-trim contenteditable style="font-size: 18px;">
+public function index(EnrollmentBrowseRequest $request)
+{
+	$this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
+	$enrollments = $this->repository->with(['classroom', 'course', 'study'])->all();
+	if (request()->wantsJson()) {
+		return response()->json([
+			'data' => $enrollments,
+		]);
+	}
+	return view('enrollment_mobile::enrollments.index', compact('enrollments'));
+}
+					</code></pre>
+						<ul>
+							<li>Control·lador Restful per tant al fer un get sense paràmetres ens fa la petició desde el mètode index.</li>
+							<li>El retorno amb les seves rel·lacions de cursos i estudis.</li>
+							<li>Podem veure que utilitza en reposittory pattern amb els seus validadors i transformadors i el Request on ens retornarà un error
+							si no tenim els rols per veure els objectes.</li>
+							<li>El Reposittory Pattern diferència les peticions web de api per tant només necessitem 1 index per les 2 i ho control·larem si volem el json o el http indicant-ho al header
+							(application/json).</li>
+						</ul>
 					</section>
 				</section>
 			</div>
