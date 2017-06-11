@@ -112,6 +112,9 @@ components Vuetify.
 
 					</section>
 					<section>
+						<h3>Separation of Concerns</h3>
+					</section>
+					<section>
 						<h3>Rutes Web/Api</h3>
 						<p>Podem veure que tots els models funcionen a partir de rutes resource i per tant és creen  les routes d'un CRUD (CREATE, RETRIEVE, UPDATE, DELETE).
 						Per les rutes web utilitzarem un GET amb el middleware de web i una vegada dins el mètode index del control·lador ens diferenciarà si volem una petició web o api.</p>
@@ -539,6 +542,90 @@ router.beforeEach((to, from, next) => {
 							<li>Guardem la data en una variable dins de data que li diem courses. Que és troba dins data.data de la petició</li>
 							<li>Petició a ruta "resource" i al control·lador Restful per tant al fer un get sense paràmetres ens fa la petició desde el mètode index.</li>
 						</ul>
+					</section>
+				</section>
+				<section>
+					<section>
+						<h1>Bases de dades</h1>
+						<p>La base de dades funciona amb mysql, i les taules estan creades a partir de les migracions de laravel. Disposo d'una taula per cada model i les relacions les tinc tant als model afectats com a la migració.</p>
+						<pre><code>
+					    public function up()
+    {
+        Schema::create('enrollments', function (Blueprint $table) {
+            $table->increments('id'); //obligatori
+            $table->string('name'); //CAMP NO FORMA PART, només vull provar.
+            $table->boolean('validated')->nullable(); //només les vàlides són actives.
+            $table->boolean('finished')->nullable(); //indica si la matricula està finalitzada.
+            //$table->integer('period_id'); //De moment descartat //obligatori
+            $table->integer('user_id')->unsigned()->nullable(); //indica si la matricula està finalitzada.
+            $table->integer('classroom_id')->unsigned()->nullable(); //indica si la matricula està finalitzada.
+            $table->integer('study_id')->unsigned()->nullable();
+            $table->integer('course_id')->unsigned()->nullable();
+            $table->timestamps(); //timestamps
+
+
+
+//            $table->foreign('classroom_id')->references('id')->on('classrooms'); //indica si la matricula està finalitzada.
+//            $table->foreign('study_id')->references('id')->on('studies');
+//            $table->foreign('course_id')->references('id')->on('courses');
+        });
+
+//        Schema::create('enrollment_user', function (Blueprint $table) {
+//            $table->integer('enrollment_id')->unsigned();
+//            $table->integer('user_id')->unsigned();
+//            $table->timestamps();
+//            $table->unique(['enrollment_id', 'user_id']);
+//        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('enrollments');
+    }
+						</code></pre>
+					</section>
+					<section>
+						<h3>Seeders</h3>
+						<p>Els utilitzo per omplir la base de dades amb dades "reals" per desprès simul·lar operacions. Seeder principal aplicació on desprès el crido del projecte test per omplir totes les taules.</p>
+					<pre><code>
+public function run()
+    {
+        $this->call(EnrollmentPermissionSeeder::class);
+        $this->call(EnrollmentsTableSeeder::class);
+        $this->call(ClassroomsTableSeeder::class);
+        $this->call(CoursesTableSeeder::class);
+        $this->call(EnrollmentStudySubmodulesTableSeeder::class);
+        $this->call(PeopleTableSeeder::class);
+        $this->call(ModulesTableSeeder::class);
+        $this->call(SubmodulesTableSeeder::class);
+        $this->call(StudiesTableSeeder::class);
+    }
+}
+					</code></pre>
+					</section>
+					<section>
+						<h3>Factories</h3>
+						<p>Defineixo com vull que s'omplin les taules si és tinguesen que crear amb dades aleatories. No les uso ja que faig servir seeders un cop acabada l'aplicació per tindre un exemple més real. Necessiten ser publicades per funcionar. Exemple enrollments plenats amb faker</p>
+						<pre><code>
+$factory->define(Scool\EnrollmentMobile\Models\Enrollment::class, function (Faker\Generator $faker) {
+    //    static $password;
+    return [
+        'name' => $faker->name,
+        'validated' => $faker->boolean,
+        'finished' => $faker->boolean, //indica si la matricula està finalitzada.
+        'study_id' => $faker->randomDigit,
+        'classroom_id' => $faker->randomDigit,
+        'course_id' => $faker->randomDigit,
+        'user_id' => 1
+    ];
+});
+						</code></pre>
+						<p>Més avant explicarem com publicar-les.</p>
 					</section>
 				</section>
 			</div>
