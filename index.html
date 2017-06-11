@@ -38,12 +38,10 @@
 					<h1>Funcionament</h1>
 					<p>Paquet vue compil·lat amb cordova, que utilitza la plantilla <a href="https://vuematerial.github.io/#/">Vue Material</a> i alguns components de
 					<a href="https://vuetifyjs.com/">Vuetify</a>.</p>
-
-					<p>És una aplicació SPA (Single Page Application) que utilitza vue-router per la navegació i axios per fer peticions a la API</p>
 				</section>
 
 				<section>
-					<h1>Projecte</h1>
+					<h1>Referències</h1>
 					<ul>
 						<li><a href="https://manelgavalda.github.io/LandingPage">Landing Page</a></li>
 						<li><a href="http://enrollmentmobile.manelgavalda.sintesi.acacha.org:8080">Admin Demo</a></li>
@@ -113,6 +111,415 @@ components Vuetify.
 							realitzada.</p>
 
 					</section>
+					<section>
+						<h3>Rutes Web/Api</h3>
+						<p>Podem veure que tots els models funcionen a partir de rutes resource i per tant és creen  les routes d'un CRUD (CREATE, RETRIEVE, UPDATE, DELETE).
+						Per les rutes web utilitzarem un GET amb el middleware de web i una vegada dins el mètode index del control·lador ens diferenciarà si volem una petició web o api.</p>
+						<pre><code style="font-size: 14px;">
+							+--------+-----------+------------------------------------------------------------------+-----------------------------------+------------------------------------------------------------------------------------------------------+--------------+
+| Domain | Method    | URI                                                              | Name                              | Action                                                                                               | Middleware   |
++--------+-----------+------------------------------------------------------------------+-----------------------------------+------------------------------------------------------------------------------------------------------+--------------+
+|        | GET|HEAD  | /                                                                |                                   | Closure                                                                                              | web          |
+|        | GET|HEAD  | _debugbar/assets/javascript                                      | debugbar.assets.js                | Barryvdh\Debugbar\Controllers\AssetController@js                                                     |              |
+|        | GET|HEAD  | _debugbar/assets/stylesheets                                     | debugbar.assets.css               | Barryvdh\Debugbar\Controllers\AssetController@css                                                    |              |
+|        | GET|HEAD  | _debugbar/clockwork/{id}                                         | debugbar.clockwork                | Barryvdh\Debugbar\Controllers\OpenHandlerController@clockwork                                        |              |
+|        | GET|HEAD  | _debugbar/open                                                   | debugbar.openhandler              | Barryvdh\Debugbar\Controllers\OpenHandlerController@handle                                           |              |
+|        | GET|HEAD  | _dusk/login/{userId}/{guard?}                                    |                                   | Laravel\Dusk\Http\Controllers\UserController@login                                                   | web          |
+|        | GET|HEAD  | _dusk/logout/{guard?}                                            |                                   | Laravel\Dusk\Http\Controllers\UserController@logout                                                  | web          |
+|        | GET|HEAD  | _dusk/user/{guard?}                                              |                                   | Laravel\Dusk\Http\Controllers\UserController@user                                                    | web          |
+|        | GET|HEAD  | activity-feed                                                    |                                   | Scool\EnrollmentMobile\Http\Controllers\DashboardController@fetchActivityFeed                        | web,auth     |
+|        | POST      | api/v1/classrooms                                                | classrooms.store                  | Scool\EnrollmentMobile\Http\Controllers\ClassroomsController@store                                   | auth:api     |
+|        | GET|HEAD  | api/v1/classrooms                                                | classrooms.index                  | Scool\EnrollmentMobile\Http\Controllers\ClassroomsController@index                                   | auth:api     |
+|        | GET|HEAD  | api/v1/classrooms/create                                         | classrooms.create                 | Scool\EnrollmentMobile\Http\Controllers\ClassroomsController@create                                  | auth:api     |
+|        | DELETE    | api/v1/classrooms/{classroom}                                    | classrooms.destroy                | Scool\EnrollmentMobile\Http\Controllers\ClassroomsController@destroy                                 | auth:api     |
+|        | PUT|PATCH | api/v1/classrooms/{classroom}                                    | classrooms.update                 | Scool\EnrollmentMobile\Http\Controllers\ClassroomsController@update                                  | auth:api     |
+|        | GET|HEAD  | api/v1/classrooms/{classroom}                                    | classrooms.show                   | Scool\EnrollmentMobile\Http\Controllers\ClassroomsController@show                                    | auth:api     |
+|        | GET|HEAD  | api/v1/classrooms/{classroom}/edit                               | classrooms.edit                   | Scool\EnrollmentMobile\Http\Controllers\ClassroomsController@edit                                    | auth:api     |
+|        | POST      | api/v1/courses                                                   | courses.store                     | Scool\EnrollmentMobile\Http\Controllers\CoursesController@store                                      | auth:api     |
+|        | GET|HEAD  | api/v1/courses                                                   | courses.index                     | Scool\EnrollmentMobile\Http\Controllers\CoursesController@index                                      | auth:api     |
+|        | GET|HEAD  | api/v1/courses/create                                            | courses.create                    | Scool\EnrollmentMobile\Http\Controllers\CoursesController@create                                     | auth:api     |
+|        | PUT|PATCH | api/v1/courses/{course}                                          | courses.update                    | Scool\EnrollmentMobile\Http\Controllers\CoursesController@update                                     | auth:api     |
+|        | DELETE    | api/v1/courses/{course}                                          | courses.destroy                   | Scool\EnrollmentMobile\Http\Controllers\CoursesController@destroy                                    | auth:api     |
+|        | GET|HEAD  | api/v1/courses/{course}                                          | courses.show                      | Scool\EnrollmentMobile\Http\Controllers\CoursesController@show                                       | auth:api     |
+|        | GET|HEAD  | api/v1/courses/{course}/edit                                     | courses.edit                      | Scool\EnrollmentMobile\Http\Controllers\CoursesController@edit                                       | auth:api     |
+|        | GET|HEAD  | api/v1/cycles                                                    | cycles.index                      | Scool\EnrollmentMobile\Http\Controllers\CyclesController@index                                       | auth:api     |
+|        | POST      | api/v1/cycles                                                    | cycles.store                      | Scool\EnrollmentMobile\Http\Controllers\CyclesController@store                                       | auth:api     |
+|        | GET|HEAD  | api/v1/cycles/create                                             | cycles.create                     | Scool\EnrollmentMobile\Http\Controllers\CyclesController@create                                      | auth:api     |
+|        | GET|HEAD  | api/v1/cycles/{cycle}                                            | cycles.show                       | Scool\EnrollmentMobile\Http\Controllers\CyclesController@show                                        | auth:api     |
+|        | DELETE    | api/v1/cycles/{cycle}                                            | cycles.destroy                    | Scool\EnrollmentMobile\Http\Controllers\CyclesController@destroy                                     | auth:api     |
+|        | PUT|PATCH | api/v1/cycles/{cycle}                                            | cycles.update                     | Scool\EnrollmentMobile\Http\Controllers\CyclesController@update                                      | auth:api     |
+|        | GET|HEAD  | api/v1/cycles/{cycle}/edit                                       | cycles.edit                       | Scool\EnrollmentMobile\Http\Controllers\CyclesController@edit                                        | auth:api     |
+|        | POST      | api/v1/dashboard                                                 | dashboard.store                   | Scool\EnrollmentMobile\Http\Controllers\DashboardController@store                                    | auth:api     |
+|        | GET|HEAD  | api/v1/dashboard                                                 | dashboard.index                   | Scool\EnrollmentMobile\Http\Controllers\DashboardController@index                                    | auth:api     |
+|        | GET|HEAD  | api/v1/dashboard/create                                          | dashboard.create                  | Scool\EnrollmentMobile\Http\Controllers\DashboardController@create                                   | auth:api     |
+|        | GET|HEAD  | api/v1/dashboard/{dashboard}                                     | dashboard.show                    | Scool\EnrollmentMobile\Http\Controllers\DashboardController@show                                     | auth:api     |
+|        | PUT|PATCH | api/v1/dashboard/{dashboard}                                     | dashboard.update                  | Scool\EnrollmentMobile\Http\Controllers\DashboardController@update                                   | auth:api     |
+|        | DELETE    | api/v1/dashboard/{dashboard}                                     | dashboard.destroy                 | Scool\EnrollmentMobile\Http\Controllers\DashboardController@destroy                                  | auth:api     |
+|        | GET|HEAD  | api/v1/dashboard/{dashboard}/edit                                | dashboard.edit                    | Scool\EnrollmentMobile\Http\Controllers\DashboardController@edit                                     | auth:api     |
+|        | GET|HEAD  | api/v1/enrollmentStudySubmodules                                 | enrollmentStudySubmodules.index   | Scool\EnrollmentMobile\Http\Controllers\EnrollmentStudySubmodulesController@index                    | auth:api     |
+|        | POST      | api/v1/enrollmentStudySubmodules                                 | enrollmentStudySubmodules.store   | Scool\EnrollmentMobile\Http\Controllers\EnrollmentStudySubmodulesController@store                    | auth:api     |
+|        | GET|HEAD  | api/v1/enrollmentStudySubmodules/create                          | enrollmentStudySubmodules.create  | Scool\EnrollmentMobile\Http\Controllers\EnrollmentStudySubmodulesController@create                   | auth:api     |
+|        | PUT|PATCH | api/v1/enrollmentStudySubmodules/{enrollmentStudySubmodule}      | enrollmentStudySubmodules.update  | Scool\EnrollmentMobile\Http\Controllers\EnrollmentStudySubmodulesController@update                   | auth:api     |
+|        | GET|HEAD  | api/v1/enrollmentStudySubmodules/{enrollmentStudySubmodule}      | enrollmentStudySubmodules.show    | Scool\EnrollmentMobile\Http\Controllers\EnrollmentStudySubmodulesController@show                     | auth:api     |
+|        | DELETE    | api/v1/enrollmentStudySubmodules/{enrollmentStudySubmodule}      | enrollmentStudySubmodules.destroy | Scool\EnrollmentMobile\Http\Controllers\EnrollmentStudySubmodulesController@destroy                  | auth:api     |
+|        | GET|HEAD  | api/v1/enrollmentStudySubmodules/{enrollmentStudySubmodule}/edit | enrollmentStudySubmodules.edit    | Scool\EnrollmentMobile\Http\Controllers\EnrollmentStudySubmodulesController@edit                     | auth:api     |
+|        | POST      | api/v1/enrollments                                               | enrollments.store                 | Scool\EnrollmentMobile\Http\Controllers\EnrollmentsController@store                                  | auth:api     |
+|        | GET|HEAD  | api/v1/enrollments                                               | enrollments.index                 | Scool\EnrollmentMobile\Http\Controllers\EnrollmentsController@index                                  | auth:api     |
+|        | GET|HEAD  | api/v1/enrollments/create                                        | enrollments.create                | Scool\EnrollmentMobile\Http\Controllers\EnrollmentsController@create                                 | auth:api     |
+|        | DELETE    | api/v1/enrollments/{enrollment}                                  | enrollments.destroy               | Scool\EnrollmentMobile\Http\Controllers\EnrollmentsController@destroy                                | auth:api     |
+|        | GET|HEAD  | api/v1/enrollments/{enrollment}                                  | enrollments.show                  | Scool\EnrollmentMobile\Http\Controllers\EnrollmentsController@show                                   | auth:api     |
+|        | PUT|PATCH | api/v1/enrollments/{enrollment}                                  | enrollments.update                | Scool\EnrollmentMobile\Http\Controllers\EnrollmentsController@update                                 | auth:api     |
+|        | GET|HEAD  | api/v1/enrollments/{enrollment}/edit                             | enrollments.edit                  | Scool\EnrollmentMobile\Http\Controllers\EnrollmentsController@edit                                   | auth:api     |
+|        | GET|HEAD  | api/v1/enrollments_from_user                                     |                                   | Closure                                                                                              | auth:api     |
+|        | GET|HEAD  | api/v1/modules                                                   | modules.index                     | Scool\EnrollmentMobile\Http\Controllers\ModulesController@index                                      | auth:api     |
+|        | POST      | api/v1/modules                                                   | modules.store                     | Scool\EnrollmentMobile\Http\Controllers\ModulesController@store                                      | auth:api     |
+|        | GET|HEAD  | api/v1/modules/create                                            | modules.create                    | Scool\EnrollmentMobile\Http\Controllers\ModulesController@create                                     | auth:api     |
+|        | DELETE    | api/v1/modules/{module}                                          | modules.destroy                   | Scool\EnrollmentMobile\Http\Controllers\ModulesController@destroy                                    | auth:api     |
+|        | PUT|PATCH | api/v1/modules/{module}                                          | modules.update                    | Scool\EnrollmentMobile\Http\Controllers\ModulesController@update                                     | auth:api     |
+|        | GET|HEAD  | api/v1/modules/{module}                                          | modules.show                      | Scool\EnrollmentMobile\Http\Controllers\ModulesController@show                                       | auth:api     |
+|        | GET|HEAD  | api/v1/modules/{module}/edit                                     | modules.edit                      | Scool\EnrollmentMobile\Http\Controllers\ModulesController@edit                                       | auth:api     |
+|        | POST      | api/v1/modules_from_course                                       |                                   | Closure                                                                                              | auth:api     |
+|        | GET|HEAD  | api/v1/people                                                    | people.index                      | Scool\EnrollmentMobile\Http\Controllers\PeopleController@index                                       | auth:api     |
+|        | POST      | api/v1/people                                                    | people.store                      | Scool\EnrollmentMobile\Http\Controllers\PeopleController@store                                       | auth:api     |
+|        | GET|HEAD  | api/v1/people/create                                             | people.create                     | Scool\EnrollmentMobile\Http\Controllers\PeopleController@create                                      | auth:api     |
+|        | GET|HEAD  | api/v1/people/{person}                                           | people.show                       | Scool\EnrollmentMobile\Http\Controllers\PeopleController@show                                        | auth:api     |
+|        | DELETE    | api/v1/people/{person}                                           | people.destroy                    | Scool\EnrollmentMobile\Http\Controllers\PeopleController@destroy                                     | auth:api     |
+|        | PUT|PATCH | api/v1/people/{person}                                           | people.update                     | Scool\EnrollmentMobile\Http\Controllers\PeopleController@update                                      | auth:api     |
+|        | GET|HEAD  | api/v1/people/{person}/edit                                      | people.edit                       | Scool\EnrollmentMobile\Http\Controllers\PeopleController@edit                                        | auth:api     |
+|        | GET|HEAD  | api/v1/person_from_user                                          |                                   | Closure                                                                                              | auth:api     |
+|        | POST      | api/v1/submoduleTypes                                            | submoduleTypes.store              | Scool\EnrollmentMobile\Http\Controllers\SubmoduleTypesController@store                               | auth:api     |
+|        | GET|HEAD  | api/v1/submoduleTypes                                            | submoduleTypes.index              | Scool\EnrollmentMobile\Http\Controllers\SubmoduleTypesController@index                               | auth:api     |
+|        | GET|HEAD  | api/v1/submoduleTypes/create                                     | submoduleTypes.create             | Scool\EnrollmentMobile\Http\Controllers\SubmoduleTypesController@create                              | auth:api     |
+|        | GET|HEAD  | api/v1/submoduleTypes/{submoduleType}                            | submoduleTypes.show               | Scool\EnrollmentMobile\Http\Controllers\SubmoduleTypesController@show                                | auth:api     |
+|        | DELETE    | api/v1/submoduleTypes/{submoduleType}                            | submoduleTypes.destroy            | Scool\EnrollmentMobile\Http\Controllers\SubmoduleTypesController@destroy                             | auth:api     |
+|        | PUT|PATCH | api/v1/submoduleTypes/{submoduleType}                            | submoduleTypes.update             | Scool\EnrollmentMobile\Http\Controllers\SubmoduleTypesController@update                              | auth:api     |
+|        | GET|HEAD  | api/v1/submoduleTypes/{submoduleType}/edit                       | submoduleTypes.edit               | Scool\EnrollmentMobile\Http\Controllers\SubmoduleTypesController@edit                                | auth:api     |
+|        | GET|HEAD  | api/v1/submodules                                                | submodules.index                  | Scool\EnrollmentMobile\Http\Controllers\SubmodulesController@index                                   | auth:api     |
+|        | POST      | api/v1/submodules                                                | submodules.store                  | Scool\EnrollmentMobile\Http\Controllers\SubmodulesController@store                                   | auth:api     |
+|        | GET|HEAD  | api/v1/submodules/create                                         | submodules.create                 | Scool\EnrollmentMobile\Http\Controllers\SubmodulesController@create                                  | auth:api     |
+|        | PUT|PATCH | api/v1/submodules/{submodule}                                    | submodules.update                 | Scool\EnrollmentMobile\Http\Controllers\SubmodulesController@update                                  | auth:api     |
+|        | GET|HEAD  | api/v1/submodules/{submodule}                                    | submodules.show                   | Scool\EnrollmentMobile\Http\Controllers\SubmodulesController@show                                    | auth:api     |
+|        | DELETE    | api/v1/submodules/{submodule}                                    | submodules.destroy                | Scool\EnrollmentMobile\Http\Controllers\SubmodulesController@destroy                                 | auth:api     |
+|        | GET|HEAD  | api/v1/submodules/{submodule}/edit                               | submodules.edit                   | Scool\EnrollmentMobile\Http\Controllers\SubmodulesController@edit                                    | auth:api     |
+|        | GET|HEAD  | api/v1/user                                                      |                                   | Closure                                                                                              | api,auth:api |
+|        | GET|HEAD  | auth/{socialProvider}                                            |                                   | Acacha\LaravelSocial\Http\Controllers\SocialProvidersController@redirectToProvider                   | web          |
+|        | GET|HEAD  | auth/{socialProvider}/callback                                   |                                   | Acacha\LaravelSocial\Http\Controllers\SocialProvidersController@handleProviderCallback               | web          |
+|        | GET|HEAD  | classrooms                                                       | classrooms.index                  | Scool\EnrollmentMobile\Http\Controllers\ClassroomsController@index                                   | web,auth     |
+|        | POST      | classrooms                                                       | classrooms.store                  | Scool\EnrollmentMobile\Http\Controllers\ClassroomsController@store                                   | web,auth     |
+|        | GET|HEAD  | classrooms/create                                                | classrooms.create                 | Scool\EnrollmentMobile\Http\Controllers\ClassroomsController@create                                  | web,auth     |
+|        | DELETE    | classrooms/{classroom}                                           | classrooms.destroy                | Scool\EnrollmentMobile\Http\Controllers\ClassroomsController@destroy                                 | web,auth     |
+|        | PUT|PATCH | classrooms/{classroom}                                           | classrooms.update                 | Scool\EnrollmentMobile\Http\Controllers\ClassroomsController@update                                  | web,auth     |
+|        | GET|HEAD  | classrooms/{classroom}                                           | classrooms.show                   | Scool\EnrollmentMobile\Http\Controllers\ClassroomsController@show                                    | web,auth     |
+|        | GET|HEAD  | classrooms/{classroom}/edit                                      | classrooms.edit                   | Scool\EnrollmentMobile\Http\Controllers\ClassroomsController@edit                                    | web,auth     |
+|        | POST      | courses                                                          | courses.store                     | Scool\EnrollmentMobile\Http\Controllers\CoursesController@store                                      | web,auth     |
+|        | GET|HEAD  | courses                                                          | courses.index                     | Scool\EnrollmentMobile\Http\Controllers\CoursesController@index                                      | web,auth     |
+|        | GET|HEAD  | courses/create                                                   | courses.create                    | Scool\EnrollmentMobile\Http\Controllers\CoursesController@create                                     | web,auth     |
+|        | PUT|PATCH | courses/{course}                                                 | courses.update                    | Scool\EnrollmentMobile\Http\Controllers\CoursesController@update                                     | web,auth     |
+|        | DELETE    | courses/{course}                                                 | courses.destroy                   | Scool\EnrollmentMobile\Http\Controllers\CoursesController@destroy                                    | web,auth     |
+|        | GET|HEAD  | courses/{course}                                                 | courses.show                      | Scool\EnrollmentMobile\Http\Controllers\CoursesController@show                                       | web,auth     |
+|        | GET|HEAD  | courses/{course}/edit                                            | courses.edit                      | Scool\EnrollmentMobile\Http\Controllers\CoursesController@edit                                       | web,auth     |
+|        | GET|HEAD  | create/random/{model}                                            | createRandom                      | Scool\EnrollmentMobile\Http\Controllers\DashboardController@createRandom                             | web,auth     |
+|        | GET|HEAD  | cycles                                                           | cycles.index                      | Scool\EnrollmentMobile\Http\Controllers\CyclesController@index                                       | web,auth     |
+|        | POST      | cycles                                                           | cycles.store                      | Scool\EnrollmentMobile\Http\Controllers\CyclesController@store                                       | web,auth     |
+|        | GET|HEAD  | cycles/create                                                    | cycles.create                     | Scool\EnrollmentMobile\Http\Controllers\CyclesController@create                                      | web,auth     |
+|        | GET|HEAD  | cycles/{cycle}                                                   | cycles.show                       | Scool\EnrollmentMobile\Http\Controllers\CyclesController@show                                        | web,auth     |
+|        | PUT|PATCH | cycles/{cycle}                                                   | cycles.update                     | Scool\EnrollmentMobile\Http\Controllers\CyclesController@update                                      | web,auth     |
+|        | DELETE    | cycles/{cycle}                                                   | cycles.destroy                    | Scool\EnrollmentMobile\Http\Controllers\CyclesController@destroy                                     | web,auth     |
+|        | GET|HEAD  | cycles/{cycle}/edit                                              | cycles.edit                       | Scool\EnrollmentMobile\Http\Controllers\CyclesController@edit                                        | web,auth     |
+|        | POST      | dashboard                                                        | dashboard.store                   | Scool\EnrollmentMobile\Http\Controllers\DashboardController@store                                    | web,auth     |
+|        | GET|HEAD  | dashboard                                                        | dashboard.index                   | Scool\EnrollmentMobile\Http\Controllers\DashboardController@index                                    | web,auth     |
+|        | GET|HEAD  | dashboard/create                                                 | dashboard.create                  | Scool\EnrollmentMobile\Http\Controllers\DashboardController@create                                   | web,auth     |
+|        | PUT|PATCH | dashboard/{dashboard}                                            | dashboard.update                  | Scool\EnrollmentMobile\Http\Controllers\DashboardController@update                                   | web,auth     |
+|        | DELETE    | dashboard/{dashboard}                                            | dashboard.destroy                 | Scool\EnrollmentMobile\Http\Controllers\DashboardController@destroy                                  | web,auth     |
+|        | GET|HEAD  | dashboard/{dashboard}                                            | dashboard.show                    | Scool\EnrollmentMobile\Http\Controllers\DashboardController@show                                     | web,auth     |
+|        | GET|HEAD  | dashboard/{dashboard}/edit                                       | dashboard.edit                    | Scool\EnrollmentMobile\Http\Controllers\DashboardController@edit                                     | web,auth     |
+|        | GET|HEAD  | dashboard/{model}/number                                         | model-number                      | Scool\EnrollmentMobile\Http\Controllers\DashboardController@Number                                   | web,auth     |
+|        | GET|HEAD  | enrollment/pdf/{id}                                              |                                   | Manelgavalda\EnrollmentMobileTest\Http\Controllers\PdfController@enrollment                          | web          |
+|        | GET|HEAD  | enrollmentStudySubmodules                                        | enrollmentStudySubmodules.index   | Scool\EnrollmentMobile\Http\Controllers\EnrollmentStudySubmodulesController@index                    | web,auth     |
+|        | POST      | enrollmentStudySubmodules                                        | enrollmentStudySubmodules.store   | Scool\EnrollmentMobile\Http\Controllers\EnrollmentStudySubmodulesController@store                    | web,auth     |
+|        | GET|HEAD  | enrollmentStudySubmodules/create                                 | enrollmentStudySubmodules.create  | Scool\EnrollmentMobile\Http\Controllers\EnrollmentStudySubmodulesController@create                   | web,auth     |
+|        | GET|HEAD  | enrollmentStudySubmodules/{enrollmentStudySubmodule}             | enrollmentStudySubmodules.show    | Scool\EnrollmentMobile\Http\Controllers\EnrollmentStudySubmodulesController@show                     | web,auth     |
+|        | PUT|PATCH | enrollmentStudySubmodules/{enrollmentStudySubmodule}             | enrollmentStudySubmodules.update  | Scool\EnrollmentMobile\Http\Controllers\EnrollmentStudySubmodulesController@update                   | web,auth     |
+|        | DELETE    | enrollmentStudySubmodules/{enrollmentStudySubmodule}             | enrollmentStudySubmodules.destroy | Scool\EnrollmentMobile\Http\Controllers\EnrollmentStudySubmodulesController@destroy                  | web,auth     |
+|        | GET|HEAD  | enrollmentStudySubmodules/{enrollmentStudySubmodule}/edit        | enrollmentStudySubmodules.edit    | Scool\EnrollmentMobile\Http\Controllers\EnrollmentStudySubmodulesController@edit                     | web,auth     |
+|        | GET|HEAD  | enrollments                                                      | enrollments.index                 | Scool\EnrollmentMobile\Http\Controllers\EnrollmentsController@index                                  | web,auth     |
+|        | POST      | enrollments                                                      | enrollments.store                 | Scool\EnrollmentMobile\Http\Controllers\EnrollmentsController@store                                  | web,auth     |
+|        | GET|HEAD  | enrollments/create                                               | enrollments.create                | Scool\EnrollmentMobile\Http\Controllers\EnrollmentsController@create                                 | web,auth     |
+|        | GET|HEAD  | enrollments/{enrollment}                                         | enrollments.show                  | Scool\EnrollmentMobile\Http\Controllers\EnrollmentsController@show                                   | web,auth     |
+|        | PUT|PATCH | enrollments/{enrollment}                                         | enrollments.update                | Scool\EnrollmentMobile\Http\Controllers\EnrollmentsController@update                                 | web,auth     |
+|        | DELETE    | enrollments/{enrollment}                                         | enrollments.destroy               | Scool\EnrollmentMobile\Http\Controllers\EnrollmentsController@destroy                                | web,auth     |
+|        | GET|HEAD  | enrollments/{enrollment}/edit                                    | enrollments.edit                  | Scool\EnrollmentMobile\Http\Controllers\EnrollmentsController@edit                                   | web,auth     |
+|        | GET|HEAD  | enrollmentspdf/pdf                                               |                                   | Manelgavalda\EnrollmentMobileTest\Http\Controllers\PdfController@enrollments                         | web          |
+|        | GET|HEAD  | enrollmentspdf/view                                              |                                   | Manelgavalda\EnrollmentMobileTest\Http\Controllers\PdfController@enrollments_view                    | web          |
+|        | GET|HEAD  | families                                                         | families.index                    | Scool\EnrollmentMobile\Http\Controllers\FamiliesController@index                                     | web,auth     |
+|        | POST      | families                                                         | families.store                    | Scool\EnrollmentMobile\Http\Controllers\FamiliesController@store                                     | web,auth     |
+|        | GET|HEAD  | families/create                                                  | families.create                   | Scool\EnrollmentMobile\Http\Controllers\FamiliesController@create                                    | web,auth     |
+|        | DELETE    | families/{family}                                                | families.destroy                  | Scool\EnrollmentMobile\Http\Controllers\FamiliesController@destroy                                   | web,auth     |
+|        | GET|HEAD  | families/{family}                                                | families.show                     | Scool\EnrollmentMobile\Http\Controllers\FamiliesController@show                                      | web,auth     |
+|        | PUT|PATCH | families/{family}                                                | families.update                   | Scool\EnrollmentMobile\Http\Controllers\FamiliesController@update                                    | web,auth     |
+|        | GET|HEAD  | families/{family}/edit                                           | families.edit                     | Scool\EnrollmentMobile\Http\Controllers\FamiliesController@edit                                      | web,auth     |
+|        | GET|HEAD  | home                                                             |                                   | Manelgavalda\EnrollmentMobileTest\Http\Controllers\HomeController@index                              | web,auth     |
+|        | POST      | login                                                            |                                   | Manelgavalda\EnrollmentMobileTest\Http\Controllers\Auth\LoginController@login                        | web,guest    |
+|        | GET|HEAD  | login                                                            | login                             | Manelgavalda\EnrollmentMobileTest\Http\Controllers\Auth\LoginController@showLoginForm                | web,guest    |
+|        | POST      | logout                                                           | logout                            | Manelgavalda\EnrollmentMobileTest\Http\Controllers\Auth\LoginController@logout                       | web          |
+|        | GET|HEAD  | mail                                                             |                                   | Manelgavalda\EnrollmentMobileTest\Http\Controllers\HomeController@mail                               | web,auth     |
+|        | GET|HEAD  | modules                                                          | modules.index                     | Scool\EnrollmentMobile\Http\Controllers\ModulesController@index                                      | web,auth     |
+|        | POST      | modules                                                          | modules.store                     | Scool\EnrollmentMobile\Http\Controllers\ModulesController@store                                      | web,auth     |
+|        | GET|HEAD  | modules/create                                                   | modules.create                    | Scool\EnrollmentMobile\Http\Controllers\ModulesController@create                                     | web,auth     |
+|        | DELETE    | modules/{module}                                                 | modules.destroy                   | Scool\EnrollmentMobile\Http\Controllers\ModulesController@destroy                                    | web,auth     |
+|        | PUT|PATCH | modules/{module}                                                 | modules.update                    | Scool\EnrollmentMobile\Http\Controllers\ModulesController@update                                     | web,auth     |
+|        | GET|HEAD  | modules/{module}                                                 | modules.show                      | Scool\EnrollmentMobile\Http\Controllers\ModulesController@show                                       | web,auth     |
+|        | GET|HEAD  | modules/{module}/edit                                            | modules.edit                      | Scool\EnrollmentMobile\Http\Controllers\ModulesController@edit                                       | web,auth     |
+|        | POST      | oauth/authorize                                                  |                                   | \Laravel\Passport\Http\Controllers\ApproveAuthorizationController@approve                            | web,auth     |
+|        | GET|HEAD  | oauth/authorize                                                  |                                   | \Laravel\Passport\Http\Controllers\AuthorizationController@authorize                                 | web,auth     |
+|        | DELETE    | oauth/authorize                                                  |                                   | \Laravel\Passport\Http\Controllers\DenyAuthorizationController@deny                                  | web,auth     |
+|        | POST      | oauth/clients                                                    |                                   | \Laravel\Passport\Http\Controllers\ClientController@store                                            | web,auth     |
+|        | GET|HEAD  | oauth/clients                                                    |                                   | \Laravel\Passport\Http\Controllers\ClientController@forUser                                          | web,auth     |
+|        | DELETE    | oauth/clients/{client_id}                                        |                                   | \Laravel\Passport\Http\Controllers\ClientController@destroy                                          | web,auth     |
+|        | PUT       | oauth/clients/{client_id}                                        |                                   | \Laravel\Passport\Http\Controllers\ClientController@update                                           | web,auth     |
+|        | GET|HEAD  | oauth/personal-access-tokens                                     |                                   | \Laravel\Passport\Http\Controllers\PersonalAccessTokenController@forUser                             | web,auth     |
+|        | POST      | oauth/personal-access-tokens                                     |                                   | \Laravel\Passport\Http\Controllers\PersonalAccessTokenController@store                               | web,auth     |
+|        | DELETE    | oauth/personal-access-tokens/{token_id}                          |                                   | \Laravel\Passport\Http\Controllers\PersonalAccessTokenController@destroy                             | web,auth     |
+|        | GET|HEAD  | oauth/scopes                                                     |                                   | \Laravel\Passport\Http\Controllers\ScopeController@all                                               | web,auth     |
+|        | POST      | oauth/token                                                      |                                   | \Laravel\Passport\Http\Controllers\AccessTokenController@issueToken                                  | throttle     |
+|        | POST      | oauth/token/refresh                                              |                                   | \Laravel\Passport\Http\Controllers\TransientTokenController@refresh                                  | web,auth     |
+|        | GET|HEAD  | oauth/tokens                                                     |                                   | \Laravel\Passport\Http\Controllers\AuthorizedAccessTokenController@forUser                           | web,auth     |
+|        | DELETE    | oauth/tokens/{token_id}                                          |                                   | \Laravel\Passport\Http\Controllers\AuthorizedAccessTokenController@destroy                           | web,auth     |
+|        | POST      | password/email                                                   | password.email                    | Manelgavalda\EnrollmentMobileTest\Http\Controllers\Auth\ForgotPasswordController@sendResetLinkEmail  | web,guest    |
+|        | GET|HEAD  | password/reset                                                   | password.request                  | Manelgavalda\EnrollmentMobileTest\Http\Controllers\Auth\ForgotPasswordController@showLinkRequestForm | web,guest    |
+|        | POST      | password/reset                                                   |                                   | Manelgavalda\EnrollmentMobileTest\Http\Controllers\Auth\ResetPasswordController@reset                | web,guest    |
+|        | GET|HEAD  | password/reset/{token}                                           | password.reset                    | Manelgavalda\EnrollmentMobileTest\Http\Controllers\Auth\ResetPasswordController@showResetForm        | web,guest    |
+|        | POST      | people                                                           | people.store                      | Scool\EnrollmentMobile\Http\Controllers\PeopleController@store                                       | web,auth     |
+|        | GET|HEAD  | people                                                           | people.index                      | Scool\EnrollmentMobile\Http\Controllers\PeopleController@index                                       | web,auth     |
+|        | GET|HEAD  | people/create                                                    | people.create                     | Scool\EnrollmentMobile\Http\Controllers\PeopleController@create                                      | web,auth     |
+|        | PUT|PATCH | people/{person}                                                  | people.update                     | Scool\EnrollmentMobile\Http\Controllers\PeopleController@update                                      | web,auth     |
+|        | DELETE    | people/{person}                                                  | people.destroy                    | Scool\EnrollmentMobile\Http\Controllers\PeopleController@destroy                                     | web,auth     |
+|        | GET|HEAD  | people/{person}                                                  | people.show                       | Scool\EnrollmentMobile\Http\Controllers\PeopleController@show                                        | web,auth     |
+|        | GET|HEAD  | people/{person}/edit                                             | people.edit                       | Scool\EnrollmentMobile\Http\Controllers\PeopleController@edit                                        | web,auth     |
+|        | GET|HEAD  | profile/tokens                                                   |                                   | Closure                                                                                              | web,auth     |
+|        | GET|HEAD  | register                                                         | register                          | Manelgavalda\EnrollmentMobileTest\Http\Controllers\Auth\RegisterController@showRegistrationForm      | web,guest    |
+|        | POST      | register                                                         |                                   | Manelgavalda\EnrollmentMobileTest\Http\Controllers\Auth\RegisterController@register                  | web,guest    |
+|        | GET|HEAD  | submoduleTypes                                                   | submoduleTypes.index              | Scool\EnrollmentMobile\Http\Controllers\SubmoduleTypesController@index                               | web,auth     |
+|        | POST      | submoduleTypes                                                   | submoduleTypes.store              | Scool\EnrollmentMobile\Http\Controllers\SubmoduleTypesController@store                               | web,auth     |
+|        | GET|HEAD  | submoduleTypes/create                                            | submoduleTypes.create             | Scool\EnrollmentMobile\Http\Controllers\SubmoduleTypesController@create                              | web,auth     |
+|        | GET|HEAD  | submoduleTypes/{submoduleType}                                   | submoduleTypes.show               | Scool\EnrollmentMobile\Http\Controllers\SubmoduleTypesController@show                                | web,auth     |
+|        | DELETE    | submoduleTypes/{submoduleType}                                   | submoduleTypes.destroy            | Scool\EnrollmentMobile\Http\Controllers\SubmoduleTypesController@destroy                             | web,auth     |
+|        | PUT|PATCH | submoduleTypes/{submoduleType}                                   | submoduleTypes.update             | Scool\EnrollmentMobile\Http\Controllers\SubmoduleTypesController@update                              | web,auth     |
+|        | GET|HEAD  | submoduleTypes/{submoduleType}/edit                              | submoduleTypes.edit               | Scool\EnrollmentMobile\Http\Controllers\SubmoduleTypesController@edit                                | web,auth     |
+|        | POST      | submodules                                                       | submodules.store                  | Scool\EnrollmentMobile\Http\Controllers\SubmodulesController@store                                   | web,auth     |
+|        | GET|HEAD  | submodules                                                       | submodules.index                  | Scool\EnrollmentMobile\Http\Controllers\SubmodulesController@index                                   | web,auth     |
+|        | GET|HEAD  | submodules/create                                                | submodules.create                 | Scool\EnrollmentMobile\Http\Controllers\SubmodulesController@create                                  | web,auth     |
+|        | GET|HEAD  | submodules/{submodule}                                           | submodules.show                   | Scool\EnrollmentMobile\Http\Controllers\SubmodulesController@show                                    | web,auth     |
+|        | DELETE    | submodules/{submodule}                                           | submodules.destroy                | Scool\EnrollmentMobile\Http\Controllers\SubmodulesController@destroy                                 | web,auth     |
+|        | PUT|PATCH | submodules/{submodule}                                           | submodules.update                 | Scool\EnrollmentMobile\Http\Controllers\SubmodulesController@update                                  | web,auth     |
+|        | GET|HEAD  | submodules/{submodule}/edit                                      | submodules.edit                   | Scool\EnrollmentMobile\Http\Controllers\SubmodulesController@edit                                    | web,auth     |
++--------+-----------+------------------------------------------------------------------+-----------------------------------+------------------------------------------------------------------------------------------------------+--------------+
+
+						</code></pre>
+					</section>
+					<section>
+						<h3>Fitxer de rutes</h3>
+						<pre><code>
+
+<?php
+use Illuminate\Support\Facades\Auth;
+use Scool\EnrollmentMobile\Models\Enrollment;
+use Scool\EnrollmentMobile\Models\Person;
+use Scool\Foundation\User;
+Route::group([
+    'middleware' => 'web'], function () {
+        Route::group(['middleware' => 'auth'], function () {
+            Route::resource('enrollments', 'EnrollmentsController');
+            Route::resource('classrooms', 'ClassroomsController');
+            Route::resource('courses', 'CoursesController');
+            Route::resource('enrollmentStudySubmodules', 'EnrollmentStudySubmodulesController');
+            Route::resource('families', 'FamiliesController');
+            Route::resource('modules', 'ModulesController');
+            Route::resource('cycles', 'CyclesController');
+            Route::resource('submodules', 'SubmodulesController');
+            Route::resource('submoduleTypes', 'SubmoduleTypesController');
+            Route::resource('dashboard', 'DashboardController');
+            Route::resource('people', 'PeopleController');
+            //Dashboard
+            Route::get('activity-feed', 'DashboardController@fetchActivityFeed');
+            Route::get('dashboard/{model}/number', 'DashboardController@Number')->name('model-number');
+            Route::get('create/random/{model}', 'DashboardController@createRandom')->name('createRandom');
+        });
+    });
+Route::group([
+    'middleware' => 'auth:api',
+    'prefix' => 'api',
+], function () {
+    //Route::group(['prefix' => 'v1','middleware' => 'auth:api'], function () {
+    Route::group(['prefix' => 'v1'], function () {
+        Route::resource('enrollments', 'EnrollmentsController');
+        Route::resource('classrooms', 'ClassroomsController');
+        Route::resource('courses', 'CoursesController');
+        Route::resource('enrollmentStudySubmodules', 'EnrollmentStudySubmodulesController');
+        Route::resource('modules', 'ModulesController');
+        Route::resource('cycles', 'CyclesController');
+        Route::resource('submodules', 'SubmodulesController');
+        Route::resource('submoduleTypes', 'SubmoduleTypesController');
+        Route::resource('dashboard', 'DashboardController');
+        Route::resource('people', 'PeopleController');
+        Route::get('/enrollments_from_user', function (Request $request) {
+            //            return Enrollment::all();
+//            $user = Auth::user();
+            $enrollment_id = Auth::user()->enrollment_id;
+            return Enrollment::find($enrollment_id);
+        });
+        Route::get('/person_from_user', function (Request $request) {
+            //            return Enrollment::all();
+//            $user = Auth::user();
+            $user_id = Auth::user()->person_id;
+            return Person::find($user_id);
+        });
+        Route::post('/modules_from_course', function (Request $request) {
+            //            return Enrollment::all();
+//            $user = Auth::user();
+            return Person::find($user_id);
+        });
+    });
+});
+						</code></pre>
+						<p>Aqui tenim les rutes necessaries per al funcionament del paquet. Com podem veure utilitzem el middleware web i auth per les rutes web, i el middleware auth:api (passport) amb prefix "api/v1" per control·lar que tingues autorització(token) per fer les peticions.</p>
+						</section>
+
+
+					<section>
+						<h3>Codi Control·lador</h3>
+						<pre><code class="javascript" data-trim contenteditable style="font-size: 18px;">
+public function index(EnrollmentBrowseRequest $request)
+{
+	$this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
+	$enrollments = $this->repository->with(['classroom', 'course', 'study'])->all();
+	if (request()->wantsJson()) {
+		return response()->json([
+			'data' => $enrollments,
+		]);
+	}
+	return view('enrollment_mobile::enrollments.index', compact('enrollments'));
+	return view('enrollment_mobile::enrollments.index', compact('enrollments'));
+}
+					</code></pre>
+						<ul>
+							<li>El retorno amb les seves rel·lacions de cursos i estudis.</li>
+							<li>Podem veure que utilitza en reposittory pattern amb els seus validadors i transformadors i el Request on ens retornarà un error
+								si no tenim els rols per veure els objectes.</li>
+							<li>El Reposittory Pattern diferència les peticions web de api per tant només necessitem 1 index per les 2 i ho control·larem si volem el json o el http indicant-ho al header
+								(application/json).</li>
+						</ul>
+					</section>
+						<section>
+							<h3>Petició</h3>
+							<p>Per control·lar si la petició és web o api, basicament ho farem indicant-ho al header al fer la petició. Amb Axios afegirem els headers així de forma global per no tindre que indicar-los a cada petició que farem.</p>
+							<pre><code class="javascript">
+window.axios.defaults.headers.common = {
+  'Authorization': 'Bearer ' + window.localStorage.getItem('token'),
+  'X-Requested-With': 'XMLHttpRequest',
+  'Accept': 'application/json'
+						</code></pre>
+							<ul>
+								<li>Headers:</li>
+								<ul>
+									<li>Authorization: ens servirà per indicar el token que la api ens retornarà per fer peticions. L'afegirem d'aquesta forma "Bearer + token" (Bearer dsiaSdi2)</li>
+									<li>X-Requested-With: Tipus de petició que farem (XHR) </li>
+									<li>Accept: Aqui li indiquem que la petició serà api, format json, ja que el Reposittory Pattern diferèncie d'aquesta forma les peticions webs i api. </li>
+								</ul>
+							</ul>
+						</section>
+					</section>
+				</section>
+				<section>
+					<section>
+						<h1>Arquitectura del Frontend</h1>
+						<p>El frontend està fet a partir d'un projecte creat amb <a href="https://github.com/vuejs/vue-cli"> vue-cli v2.8.2</a>, i una vegada compil·lat afegir el resultat a una plantilla cordova creada amb
+							<a href="https://cordova.apache.org/docs/es/latest/guide/cli/">cordova-cli v7.x</a>.
+							Funciona amb <a href="https://vuejs.org/">Vue v2.2.2</a>, utilitzant
+							<a href="https://vuematerial.github.io/#/">Vue material v0.7.1</a> com a plantilla principal (tema i sidebar), i utilitzant els components de
+							<a href="https://vuetifyjs.com/">Vuetify v0.12.7</a>.</p>
+						<p>Aplicació SPA (Single Page Application) que utilitza vue-router per la navegació i axios per fer peticions a la API</p>
+
+
+					</section>
+					<section>
+					<h3>Rutes frontend</h3>
+					<pre><code class="javascript">
+  {
+    path: '/',
+    redirect: '/home',
+    meta: { auth: true },
+    component: Full,
+    children: [
+      {
+        path: 'home',
+        name: 'Home',
+        component: Home,
+        meta: { auth: true }
+      },
+      {
+        path: 'profile',
+        name: 'Profile',
+        component: Profile,
+        meta: { auth: true }
+      },
+      {
+        path: 'enrollments',
+        name: 'Enrollments',
+        component: Enrollments,
+        meta: { auth: true }
+      }
+    ]
+  },
+  {
+    path: '/android_asset/www/index.html',
+    redirect: '/'
+  },
+  {
+    path: '/login',
+    component: Login,
+    meta: { auth: false },
+    children: [
+      {
+        path: 'login',
+        name: 'Login',
+        component: Login,
+        meta: { auth: false }
+      }
+    ]
+  },
+  {
+    path: '*',
+    redirect: '/login',
+    meta: { auth: false }
+  }
+					</code></pre>
+						<p>En aquest cas per control·lar a quines rutes tenim acces utilitzem el meta {auth:true} per indicar les rutes que necessiten estar autenticats.
+						Les rutes dins de children penjaran del component pare, en aquest cas totes les rutes menys la de login penjaran del component Full que conté la sidebar, footer i header.
+						</p>
+					</section>
+					<section>
+						<h3>Middleware</h3>
+						<pre><code class="javascript">
+const router = new VueRouter({
+    // history mode html5 per borrar #
+  // mode: 'hash',
+  mode: 'history',
+  routes
+  // linkActiveClass: 'open active',
+  // scrollBehavior: () => ({ y: 0 })
+})
+
+router.beforeEach((to, from, next) => {
+  console.log(window.localStorage.getItem('system_id'))
+  if (to.meta.auth && !window.localStorage.getItem('token')) {
+    return next('/Login')
+  }
+  next()
+})
+						</code></pre>
+						<p>Aqui tenim el middleware de l'aplicació que basicament control·lara que si estem nabegant però no tenim token ens retornarà al Login</p>
+					</section>
 					<section data-state="customevent">
 						<h3>Exemple de petició feta amb Axios sobre el controlador de enrollments per retornar-los.</h3>
 						<pre><code class="javascript" data-trim contenteditable style="font-size: 18px;">
@@ -130,30 +537,7 @@ components Vuetify.
 						<ul>
 							<li>Petició amb l'objecte Axios( el necessitem instanciar al projecte).</li>
 							<li>Guardem la data en una variable dins de data que li diem courses. Que és troba dins data.data de la petició</li>
-						</ul>
-					</section>
-					<section>
-						<h3>Codi Control·lador</h3>
-						<pre><code class="javascript" data-trim contenteditable style="font-size: 18px;">
-public function index(EnrollmentBrowseRequest $request)
-{
-	$this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
-	$enrollments = $this->repository->with(['classroom', 'course', 'study'])->all();
-	if (request()->wantsJson()) {
-		return response()->json([
-			'data' => $enrollments,
-		]);
-	}
-	return view('enrollment_mobile::enrollments.index', compact('enrollments'));
-}
-					</code></pre>
-						<ul>
-							<li>Control·lador Restful per tant al fer un get sense paràmetres ens fa la petició desde el mètode index.</li>
-							<li>El retorno amb les seves rel·lacions de cursos i estudis.</li>
-							<li>Podem veure que utilitza en reposittory pattern amb els seus validadors i transformadors i el Request on ens retornarà un error
-							si no tenim els rols per veure els objectes.</li>
-							<li>El Reposittory Pattern diferència les peticions web de api per tant només necessitem 1 index per les 2 i ho control·larem si volem el json o el http indicant-ho al header
-							(application/json).</li>
+							<li>Petició a ruta "resource" i al control·lador Restful per tant al fer un get sense paràmetres ens fa la petició desde el mètode index.</li>
 						</ul>
 					</section>
 				</section>
