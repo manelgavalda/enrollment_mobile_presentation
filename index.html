@@ -45,6 +45,7 @@
 					<ul>
 						<li><a href="https://manelgavalda.github.io/LandingPage">Landing Page</a></li>
 						<li><a href="http://enrollmentmobile.manelgavalda.sintesi.acacha.org:8080">Admin Demo</a></li>
+						<li><a href="http://enrollmentmobilevue.surge.sh/">Client Demo</a></li>
 						<li><a href="https://manelgavalda.github.io/todosBackendApiDocs">Api Documentation</a></li>
 						<li>Github</li>
 						<ul>
@@ -442,8 +443,6 @@ window.axios.defaults.headers.common = {
 							<a href="https://vuematerial.github.io/#/">Vue material v0.7.1</a> com a plantilla principal (tema i sidebar), i utilitzant els components de
 							<a href="https://vuetifyjs.com/">Vuetify v0.12.7</a>.</p>
 						<p>Aplicació SPA (Single Page Application) que utilitza vue-router per la navegació i axios per fer peticions a la API</p>
-
-
 					</section>
 					<section>
 					<h3>Rutes frontend</h3>
@@ -781,7 +780,267 @@ public function destroy(EnrollmentDeleteRequest $request, $id)
 							<li>Paquet composer principal: Núcli del projecte que conté tot el codi, migracions i altres eines necessaries per a crear el nostre projecte.</li>
 							<li>Projecte test: Contindrà la base (projecte laravel) on afegirem el nostre paquet de composer.</li>
 							<li>Projecte vue: Utilitzarem com a aplicació que utilitzarà el client per gestionar les seves matrícules.</li>
-							<li>Projecte Cordova</li>
+							<li>Projecte Cordova: Projecte creat amb vue-cli que servirà de base per fer l'aplicació mobile juntament amb el vue compil·lat.</li>
+						</ul>
+					</section>
+					<section>
+						<h3>Paquet composer</h3>
+						<ul>
+							<li>Creat a partir d'extraure les parts específiques del nostre paquet d'un projecte laravel de test per comprovar el bon funcionament del nostre codi.</li>
+							<li>Treball usant el github.</li>
+							<li>Publicat al packagist i afegit els badges per informar del seu funcionament.</li>
+							<li>Penjat al servidor per funcionar amb el paquet de test de forma local (també es podria instal·lar directament afegint-lo al composer.json) ja que el tenim publicat.</li>
+						</ul>
+					</section>
+					<section>
+						<h3>Paquet test</h3>
+						<ul>
+							<li>Projecte laravel utilitzat per comprovar el nostre funcionament del paquet i que acaba sent la base per la demo online del nostre projecte.</li>
+							<li>Treball usant el github.</li>
+							<li>Penjat al servidor i treballant amb un nginx i una bd mysql.</li>
+						</ul>
+					</section>
+					<section>
+						<h3>Paquet Vue</h3>
+						<ul>
+							<li>Creat amb el vue cli.</li>
+							<li>Treball usant el github.</li>
+							<li>Compil·lat per utilitzar-lo juntament amb el projecte cordova.</li>
+							<li>S'afegeix al projecte cordova amb un link de la carpeta compil·lada per funcionar directament.</li>
+						</ul>
+					</section>
+					<section data-background="images/store.png">
+						<h3 style="color:black">Paquet Cordova</h3>
+						<code style="background:black">
+							Creat amb el cordova cli.
+							Treball usant el github.
+							Publicat al playStore (en teoría si el fiquem al apple store també podriem utilitzar-lo ja que és multiplataforma).
+							Conté un projecte cordova amb la carpeta del projecte vue compil·lada com a base i on tenim tots els plugins cordova necessaris perquè funcioni.
+						</code>
+					</section>
+				</section>
+				<section>
+					<section>
+						<h1>Testos unitaris, d'acceptació i d'api</h1>
+					</section>
+					<section>
+						<h3>Testos Api</h3>
+						<p>Testos per comprovar el bon funcionament de la nostra api:</p>
+						<ul>
+							<li>Funcionament del crud.</li>
+							<li>Permissos.</li>
+							<li>Autorització.</li>
+						</ul>
+					</section>
+					<section>
+						<h3>Testos Frontend</h3>
+						<p>Testos per comprovar bàsicament el bon funcionament dels pdfs. Usant el laravel dusk</p>
+						<ul>
+							<li>Veus el que tendries que veure.</li>
+							<li>Entres a l'aplicació abans de comprovar-ho.</li>
+						</ul>
+					</section>
+				</section>
+				<section>
+					<section>
+						<h1>Continuos integration i qualitat del projecte</h1>
+					</section>
+				</section>
+				<section>
+					<section>
+						<h1>SOLID</h1>
+					</section>
+					<section data-background="images/single.png">
+						<h3  style="color:black">Single Responsability</h3>
+						<p style="color:black">Es tracta de destinar cada cada classe a una finalitat senzilla i concreta.
+						Exemple en el control·lador d'enrollments on només tenim els mètodes per control·lar els enrollments:</p>
+						<pre><code style="background: black">
+							 public function store(EnrollmentCreateRequest $request)
+    {
+        try {
+            $this->validator->with($request->all())->passesOrFail(ValidatorInterface::RULE_CREATE);
+            $enrollment = $this->repository->create($request->all());
+            $response = [
+                'message' => 'Enrollment created.',
+                'data'    => $enrollment->toArray(),
+            ];
+            if ($request->wantsJson()) {
+                return response()->json($response);
+            }
+            return redirect()->back()->with('message', $response['message']);
+        } catch (ValidatorException $e) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'error'   => true,
+                    'message' => $e->getMessageBag()
+                ]);
+            }
+            return redirect()->back()->withErrors($e->getMessageBag())->withInput();
+        }
+    }
+						</code></pre>
+						<p style="color:black">Com podem veure tot el codi refrent només serveix per guardar els enrollments que creem i els validadors, transformers i altres els tenim injectats.</p>
+					</section>
+					<section>
+						<h3>Open/Closed</h3>
+						<p>Crear classes extensibles sense necessitat de canviar-les desde el codi.</p>
+						<code><pre>
+class Enrollment extends Model implements Transformable
+{
+    //afegim model stateful per als models que volem qeu tinguin estat, com en el name per als noms. Afegir columna state ala migracio de l'objecte(i ens dira com esta l'objecte de la taula(open,closed,etc), es configurable. state amb nullabel si pot ser que no es guarde
+    use TransformableTrait,Nameable, RecordsActivity;//StatefulTrait;
+    //public $timestamps = false;
+    //all camps
+    protected $fillable = ['id','name','validated','finished', 'user_id', 'study_id','course_id','classroom_id'];
+    //TODO: mirar estats (enrollment). Implementar i definir estats(exemple porta(esborrany,valida,feta).
+    //TODO: Necessari vàlid i no.
+    //TODO: Afegir rutes minim a un Model.
+    protected $events = [
+        'created' => EnrollmentCreated::class
+    ];
+							...
+						</pre></code>
+						<p>Per exemple aquesta classe l'exten un model on té el code genèric perquè sigui un model i desprès hereda d'una interfície on hi ha més codi.
+						També usa traits de forma que injecta codi per donar noves funcionalitats a la classe.</p>
+					</section>
+					<section>
+						<h3>Substitució Liskov</h3>
+						<p>Els objectes tendriem que poder ser reemplaçats per instàcies dels mateixos sense afectar el bon funcionament del programa.</p>
+						<pre><code>
+							abstract class Controller
+{
+    /**
+     * The middleware registered on the controller.
+     *
+     * @var array
+     */
+    protected $middleware = [];
+
+    /**
+     * Register middleware on the controller.
+     *
+     * @param  array|string|\Closure  $middleware
+     * @param  array   $options
+     * @return \Illuminate\Routing\ControllerMiddlewareOptions
+     */
+    public function middleware($middleware, array $options = [])
+    {
+        foreach ((array) $middleware as $m) {
+            $this->middleware[] = [
+                'middleware' => $m,
+                'options' => &$options,
+            ];
+        }
+
+        return new ControllerMiddlewareOptions($options);
+    }
+							...
+						</code></pre>
+						<p>Per exemple cada control·lador partiria d'aquesta base per funcionar.</p>
+					</section>
+					<section>
+						<h3>Segregació de l'interfície</h3>
+						<p>Les interfícies tenen que ser específiques per una finalitat concreta. Preferible tindre moltes interfícies específiques que no una que ho tingui tot ja que serà poc reusable.</p>
+						<pre><code>
+interface Authenticatable
+{
+    /**
+     * Get the name of the unique identifier for the user.
+     *
+     * @return string
+     */
+    public function getAuthIdentifierName();
+
+    /**
+     * Get the unique identifier for the user.
+     *
+     * @return mixed
+     */
+    public function getAuthIdentifier();
+
+    /**
+     * Get the password for the user.
+     *
+     * @return string
+     */
+    public function getAuthPassword();
+
+    /**
+     * Get the token value for the "remember me" session.
+     *
+     * @return string
+     */
+    public function getRememberToken();
+
+    /**
+     * Set the token value for the "remember me" session.
+     *
+     * @param  string  $value
+     * @return void
+     */
+    public function setRememberToken($value);
+
+    /**
+     * Get the column name for the "remember me" token.
+     *
+     * @return string
+     */
+    public function getRememberTokenName();
+}
+						</code></pre>
+						<p>Exemple d'interfície amb els mètodes específics perquè una classe sigui autenticable.</p>
+					</section>
+					<section>
+						<h3>Inversió de dependències</h3>
+						<p>Ús d'extraccions per aconseguir desacoplar classes.</p>
+						<pre><code>
+public function __construct(EnrollmentRepository $repository, EnrollmentValidator $validator)
+{
+	$this->repository = $repository;
+	$this->validator  = $validator;
+}
+						</code></pre>
+					</section>
+				</section>
+				<section>
+					<h1>Seguretat</h1>
+				</section>
+				<section>
+					<h1>API</h1>
+					<h3>Aplicació de patrons? (Repository Pattern?, transformers? Control errors, Ús de Json)</h3>
+					<h3>Testos</h3>
+				</section>
+				<section>
+					<h1>Frontend</h1>
+					<h3>Comunicació entre components</h3>
+					<h3>Testos Javascript (Dusk)</h3>
+					<h3>Plantilles utilitzades</h3>
+					<h3>Programació de formularis</h3>
+					<h3>Components gràfics utilitzats</h3>
+				</section>
+				<section>
+					<h1>Informes, reports i gràfiques</h1>
+				</section>
+				<section>
+					<h1>Altres</h1>
+					<h3>Email</h3>
+					<h3>Ús d'esdeveniments</h3>
+					<h3>Ús de caché</h3>
+					<h3>Treball amb fitxers</h3>
+					<h3>Treball amb línia de comandes (artisan)</h3>
+					<h3>Sheduler</h3>
+					<h3>Notificacions</h3>
+				</section>
+				<section>
+					<section>
+						<h1>Referències externes</h1>
+					</section>
+					<section>
+						<ul>
+							<li>http://blog.gauffin.org/2012/05/solid-principles-with-real-world-examples/</li>
+							<li>http://acacha.org/mediawiki/Design_Patterns#SOLID</li>
+							<li>https://www.genbetadev.com/paradigmas-de-programacion/solid-cinco-principios-basicos-de-diseno-de-clases</li>
+							<li>https://github.com/laravel/laravel</li>
 						</ul>
 					</section>
 				</section>
