@@ -44,8 +44,8 @@
 					<h1>Referències</h1>
 					<ul>
 						<li><a href="https://manelgavalda.github.io/LandingPage">Landing Page</a></li>
-						<li><a href="http://enrollmentmobile.manelgavalda.sintesi.acacha.org:8080">Admin Demo</a></li>
-						<li><a href="http://enrollmentmobilevue.surge.sh/">Client Demo</a></li>
+						<li><a href="http://enrollmentmobile.manelgavalda.sintesi.acacha.org:8080">Admin Demo (User=manelgavalda@iesebre.com Password=123456)</a></li>
+						<li><a href="http://manelgavalda-enrollmentmobilevue.surge.sh/">Client Demo (User=manelgavalda@iesebre.com Password=123456)</a></li>
 						<li><a href="https://manelgavalda.github.io/todosBackendApiDocs">Api Documentation</a></li>
 						<li>Github</li>
 						<ul>
@@ -1003,7 +1003,144 @@ public function __construct(EnrollmentRepository $repository, EnrollmentValidato
 					</section>
 				</section>
 				<section>
-					<h1>Seguretat</h1>
+					<section>
+						<h1>Seguretat</h1>
+					</section>
+					<section>
+						<h3> Autenticació API</h3>
+						<p>En aquest cas uso <a href="https://laravel.com/docs/master/passport">passport</a>  per protegir la api.
+						Laravel Passport et proveeix d'un sistema <a href="https://oauth.net/2/">Oauth2</a> que funciona amb un sistema de préstec (leasing) de token on el servidor control·la l'estat i la validesa del token.
+						 Usat per control·lar que les peticions es faiguen amb un token vàlid. Per exemple al fer el login el servidor oauth en retorna un token, que ens el guardem per fer totes les peticions posteriors i al fer el logout el·liminarem el token.</p>
+						<img src="images/oauth.png" alt="">
+					</section>
+					<section>
+					<p>
+						<h3>Permissos API</h3>
+						<p>Aqui control·larem gràcies a <a href="https://github.com/spatie/laravel-permission">laravel-permission</a> que els usuaris que faiguen les peticions tinguin permissos per gestionar el model. Juntament amb l'estructura que ens dona el
+						<a href="https://github.com/acacha/l5-repository">l5-repository</a> ens servirà per control·lar-ho ja que ens crea les request per control·lar-ho. Ens crearà una taula de permissos on els definirem i utilitzant un seeder els crearem i desprès asignarem als usuaris que vulguem.</p>
+						Migració de laravel-permission:
+						<pre><code>
+
+    public function up()
+    {
+        $tableNames = config('permission.table_names');
+        $foreignKeys = config('permission.foreign_keys');
+
+        Schema::create($tableNames['permissions'], function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('name');
+            $table->string('guard_name');
+            $table->timestamps();
+        });
+
+        Schema::create($tableNames['roles'], function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('name');
+            $table->string('guard_name');
+            $table->timestamps();
+        });
+
+        Schema::create($tableNames['model_has_permissions'], function (Blueprint $table) use ($tableNames, $foreignKeys) {
+            $table->integer('permission_id')->unsigned();
+            $table->morphs('model');
+
+            $table->foreign('permission_id')
+                ->references('id')
+                ->on($tableNames['permissions'])
+                ->onDelete('cascade');
+
+            $table->primary(['permission_id', 'model_id', 'model_type']);
+        });
+
+        Schema::create($tableNames['model_has_roles'], function (Blueprint $table) use ($tableNames, $foreignKeys) {
+            $table->integer('role_id')->unsigned();
+            $table->morphs('model');
+
+            $table->foreign('role_id')
+                ->references('id')
+                ->on($tableNames['roles'])
+                ->onDelete('cascade');
+
+            $table->primary(['role_id', 'model_id', 'model_type']);
+        });
+
+        Schema::create($tableNames['role_has_permissions'], function (Blueprint $table) use ($tableNames) {
+            $table->integer('permission_id')->unsigned();
+            $table->integer('role_id')->unsigned();
+
+            $table->foreign('permission_id')
+                ->references('id')
+                ->on($tableNames['permissions'])
+                ->onDelete('cascade');
+
+            $table->foreign('role_id')
+                ->references('id')
+                ->on($tableNames['roles'])
+                ->onDelete('cascade');
+
+            $table->primary(['permission_id', 'role_id']);
+        });
+    }
+
+						</code></pre>
+					</section>
+					<section>
+					<h3>Permissos API 2</h3>
+					<p>Creació i assignació de permissos a un rol:</p>
+						<pre><code>
+public function run()
+{
+	Permission::create(['name' => 'browse enrollments']);
+	Permission::create(['name' => 'read enrollments']);
+	Permission::create(['name' => 'edit enrollments']);
+	Permission::create(['name' => 'add enrollments']);
+	Permission::create(['name' => 'delete enrollments']);
+	$role = Role::create(['name' => 'manage enrollments']);
+	$role->givePermissionTo('browse enrollments');
+	$role->givePermissionTo('read enrollments');
+	$role->givePermissionTo('edit enrollments');
+	$role->givePermissionTo('add enrollments');
+	$role->givePermissionTo('delete enrollments');
+}
+						</code></pre>
+
+					<p>Assignació de rol a usuari:</p>
+						<pre><code>
+factory(Manelgavalda\EnrollmentMobileTest\User::class)->create([
+		"name" => "Manel Gavaldà Andreu",
+		"email" => "manelgavalda@iesebre.com",
+		"password" => bcrypt(env('ADMIN_PWD', 'password'))]
+)->assignRole("manage enrollments");
+						</code></pre>
+					</section>
+					<section data-background="images/login.png">
+						<h3 style="color:black">Ús de token</h3>
+						<p style="color:black">Ús de token per al login usant vue. El tipus d'autenticació és la de password dins el passport.
+						Amb aquesta petició agafo l'usuari introduït i si es correcte ens guardarà al token al localStorage per desprès fer peticions i ens redireccionarà dins l'aplicació.
+						És necessita la password del token dins la bd i que concedeixi amb el que usem a l'aplicació mòbil.</p>
+						<pre style="background: black"><code>
+login: function () {
+  var formData = new FormData()
+  formData.append('grant_type', constants.OAUTH_GRANT_TYPE)
+  formData.append('client_id', constants.OAUTH_CLIENT_ID)
+  formData.append('client_secret', constants.OAUTH_CLIENT_SECRET)
+  formData.append('username', this.email)
+  formData.append('password', this.password)
+  formData.append('scope', '')
+  console.log('Login')
+  axios.post('/oauth/token', formData)
+	.then((res) => {
+	  axios.defaults.headers.common['Authorization'] = 'Bearer ' + res.data.access_token
+	  localStorage.setItem('token', res.data.access_token)
+	  console.log(res.data.access_token)
+	  this.getUser()
+	  this.$router.push({path: 'home'})
+	}, (error) => {
+	  console.log(error)
+	})
+}
+						</code></pre>
+					</section>
 				</section>
 				<section>
 					<h1>API</h1>
@@ -1041,6 +1178,14 @@ public function __construct(EnrollmentRepository $repository, EnrollmentValidato
 							<li>http://acacha.org/mediawiki/Design_Patterns#SOLID</li>
 							<li>https://www.genbetadev.com/paradigmas-de-programacion/solid-cinco-principios-basicos-de-diseno-de-clases</li>
 							<li>https://github.com/laravel/laravel</li>
+							<li>https://laravel.com/docs/5.4/passport</li>
+							<li>https://github.com/laravel/passport</li>
+							<li>https://oauth.net/2/</li>
+							<li>http://acacha.org/mediawiki/Laravel_Passport#.WUAMYMx96kA</li>
+							<li>http://acacha.org/mediawiki/OAuth#.WUAMm8x96kA</li>
+							<li>https://github.com/spatie/laravel-permission</li>
+							<li>https://github.com/andersao/l5-repository</li>
+							<li>https://github.com/acacha/l5-repository</li>
 						</ul>
 					</section>
 				</section>
