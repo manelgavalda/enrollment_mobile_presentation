@@ -569,13 +569,6 @@ router.beforeEach((to, from, next) => {
 //            $table->foreign('study_id')->references('id')->on('studies');
 //            $table->foreign('course_id')->references('id')->on('courses');
         });
-
-//        Schema::create('enrollment_user', function (Blueprint $table) {
-//            $table->integer('enrollment_id')->unsigned();
-//            $table->integer('user_id')->unsigned();
-//            $table->timestamps();
-//            $table->unique(['enrollment_id', 'user_id']);
-//        });
     }
 
     /**
@@ -626,6 +619,170 @@ $factory->define(Scool\EnrollmentMobile\Models\Enrollment::class, function (Fake
 });
 						</code></pre>
 						<p>Més avant explicarem com publicar-les.</p>
+					</section>
+					<section>
+						<h3>Relacions</h3>
+						<p>Les relacions les afegirem tant al crear la taula com en els models relacionats.
+						Exemple de relació entre usuaris i enrollments:</p>
+						<pre><code>
+//        Schema::create('enrollment_user', function (Blueprint $table) {
+//            $table->integer('enrollment_id')->unsigned();
+//            $table->integer('user_id')->unsigned();
+//            $table->timestamps();
+//            $table->unique(['enrollment_id', 'user_id']);
+//        });
+						</code></pre>
+						<p>Relació un a molts (usuari té enrollments) per tant la definirem de la següent forma en els models que afecta.</p>
+						<li>Model Enrollment:</li>
+						<pre><code>
+public function user()
+{
+	return $this->belongsTo(Scool\Foundation\User::class, 'user_id');
+}
+						</code></pre>
+						<li>Model User:</li>
+						<pre><code>
+public function enrollments()
+{
+	return $this->hasMany(Enrollment::class);
+}
+						</code></pre>
+					</section>
+					<section>
+						<h3>Retornar dades</h3>
+						<p>D'aquesta forma retornem el model desitjat amb les relacions que volem.</p>
+						<pre><code>
+        $enrollments = $this->repository->with(['classroom', 'course', 'study'])->all();
+						</code></pre>
+					</section>
+				</section>
+				<section>
+					<section>
+						<h1>CRUD</h1>
+						<p>Aqui explicarem pas a pas les parts del control·lador perquè funcionin correctament totes les parts d'un CRUD. També conegut com BREAD.</p>
+					</section>
+					<section>
+						<h3>Create</h3>
+						<p>Mètode post per crear un enrollment indicant val·lidacions, control de permíssos i control d'errors gràcies al Repository Pattern.
+						<pre><code>
+ public function store(EnrollmentCreateRequest $request)
+    {
+        try {
+            $this->validator->with($request->all())->passesOrFail(ValidatorInterface::RULE_CREATE);
+            $enrollment = $this->repository->create($request->all());
+            $response = [
+                'message' => 'Enrollment created.',
+                'data'    => $enrollment->toArray(),
+            ];
+            if ($request->wantsJson()) {
+                return response()->json($response);
+            }
+            return redirect()->back()->with('message', $response['message']);
+        } catch (ValidatorException $e) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'error'   => true,
+                    'message' => $e->getMessageBag()
+                ]);
+            }
+            return redirect()->back()->withErrors($e->getMessageBag())->withInput();
+        }
+    }
+
+					</code></pre>
+					</section>
+					<section>
+						<h3>Retrieve</h3>
+						<p>Mètode Get per aconseguir els enrollments(o enrollment si indiques la id) del model usant el seu control·lador.</p>
+						Gràcies al Reposittory Pattern podem tindre els mètodes api i els de web al mateix control·lador depenent el header que indiquem
+						<pre><code>
+public function index(EnrollmentBrowseRequest $request)
+{
+	$this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
+	$enrollments = $this->repository->with(['classroom', 'course', 'study'])->all();
+	if (request()->wantsJson()) {
+		return response()->json([
+			'data' => $enrollments,
+		]);
+	}
+	return view('enrollment_mobile::enrollments.index', compact('enrollments'));
+}
+					</code></pre>
+					</section>
+					<section>
+						<h3>Update</h3>
+						<p>Mètode post per actualitzar el model.</p>
+						<pre><code>
+public function update(EnrollmentUpdateRequest $request, $id)
+{
+	try {
+		$this->validator->with($request->all())->passesOrFail(ValidatorInterface::RULE_UPDATE);
+
+		$enrollment = $this->repository->update($request->all(), $id);
+
+		$response = [
+			'message' => 'Enrollment updated.',
+			'data'    => $enrollment->toArray(),
+		];
+
+		if ($request->wantsJson()) {
+			return response()->json($response);
+		}
+
+		return redirect()->back()->with('message', $response['message']);
+	} catch (ValidatorException $e) {
+		if ($request->wantsJson()) {
+			return response()->json([
+				'error'   => true,
+				'message' => $e->getMessageBag()
+			]);
+		}
+
+		return redirect()->back()->withErrors($e->getMessageBag())->withInput();
+	}
+}
+						</code></pre>
+					</section>
+					<section>
+						<h3>Delete/Destroy</h3>
+						<p>Mètode per esborrar el recurs indicat per la id.</p>
+						<pre><code>
+public function destroy(EnrollmentDeleteRequest $request, $id)
+{
+	$deleted = $this->repository->delete($id);
+
+	if (request()->wantsJson()) {
+		return response()->json([
+			'message' => 'Enrollment deleted.',
+			'deleted' => $deleted,
+		]);
+	}
+
+	return redirect()->back()->with('message', 'Enrollment deleted.');
+}
+						</code></pre>
+					</section>
+					<section>
+						<h3>Crud fet amb HTTP</h3>
+						<p>Crud creat per l'administració de matrícules i la seva validació.</p>
+						<img src="images/crud.png" alt="" height="650">
+					</section>
+					<section>
+						<h3>Crud via API</h3>
+						<p>Podria ser qualsevol petició api (fet amb el postman per exemple), però aqui mostraré la taula amb el resultat de la petició per retornar els enrollments amb les seves rel·lacions.</p>
+						<img src="images/table.png" alt="" height="650">
+					</section>
+				</section>
+				<section>
+					<section>
+						<h1>Workflow de treball</h1>
+						<p>Estratègia seguida per acabar l'aplicació i com s'ha separat:</p>
+						<ul>
+							<li>Paquet composer principal: Núcli del projecte que conté tot el codi, migracions i altres eines necessaries per a crear el nostre projecte.</li>
+							<li>Projecte test: Contindrà la base (projecte laravel) on afegirem el nostre paquet de composer.</li>
+							<li>Projecte vue: Utilitzarem com a aplicació que utilitzarà el client per gestionar les seves matrícules.</li>
+							<li>Projecte Cordova</li>
+						</ul>
 					</section>
 				</section>
 			</div>
