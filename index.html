@@ -1143,9 +1143,83 @@ login: function () {
 					</section>
 				</section>
 				<section>
-					<h1>API</h1>
-					<h3>Aplicació de patrons? (Repository Pattern?, transformers? Control errors, Ús de Json)</h3>
-					<h3>Testos</h3>
+					<section>
+						<h1>Alertes patrons API</h1>
+					</section>
+					<section>
+						<h3>Control d'errors</h3>
+						<p>Aqui poden veure que si no tenim permissos ens saltarà l'excepeció que hem definit. En aquest cas al veure els enrollments (index GET).</p>
+						<p>Control·lador:</p>
+						<pre><code>
+public function index(EnrollmentBrowseRequest $request)
+						</code></pre>
+						<p>Request:</p>
+						<pre><code>
+
+class EnrollmentBrowseRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     *
+     * @return bool
+     */
+    public function authorize()
+    {
+        return Auth::user()->can('browse enrollments');
+    }
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array
+     */
+    public function rules()
+    {
+        return [
+            //
+        ];
+    }
+    public function forbiddenResponse()
+    {
+        return Response::make('Permission denied on showing enrollments', 403);
+    }
+}
+						</code></pre>
+					</section>
+					<section>
+						<h3>Control d'errors 2</h3>
+						<p>I ens saltaria la següent excepció:</p>
+						<img src="images/error.png" alt="">
+					</section>
+					<section>
+						<h3>Transformers</h3>
+						<p>Aquí control·lem el nostre json resultant:</p>
+						<pre><code>
+public function transform(Enrollment $model)
+{
+	return [
+		'id'         => (int) $model->id,
+		/* place your other model properties here */
+		'name'      => $model->id,
+		'validated' => (bool)$model->validated,
+		'finished' => (bool)$model->finished,
+		'study_id' => (int)$model->study_id,
+		'course_id' => (int)$model->course_id,
+		'classroom_id' => (int)$model->classroom_id,
+		'created_at' => $model->created_at,
+		'updated_at' => $model->updated_at
+	];
+}
+						</code></pre>
+						<p>I d'aquesta forma ho indiquem al mètode del control·lador:</p>
+						<pre><code>
+return $this->transformer->transform($enrollment);
+						</code></pre>
+					</section>
+					<section>
+						<h3>Transformers 2</h3>
+						<p>Aqui tenim el resultat del json usant el transformador:</p>
+						<img src="images/json.png" alt="">
+					</section>
 				</section>
 				<section>
 					<h1>Frontend</h1>
