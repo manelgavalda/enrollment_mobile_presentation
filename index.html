@@ -1222,12 +1222,292 @@ return $this->transformer->transform($enrollment);
 					</section>
 				</section>
 				<section>
-					<h1>Frontend</h1>
-					<h3>Comunicació entre components</h3>
-					<h3>Testos Javascript (Dusk)</h3>
-					<h3>Plantilles utilitzades</h3>
-					<h3>Programació de formularis</h3>
-					<h3>Components gràfics utilitzats</h3>
+					<section>
+						<h1>Frontend</h1>
+					</section>
+					<section>
+						<h3>Comunicació entre components</h3>
+					</section>
+					<section>
+						<h3>Testos Javascript (Dusk)</h3>
+					</section>
+					<section>
+						<h3>Plantilles utilitzades</h3>
+						<p>Per la part d'administració he utilitzat adminlte a partir del projecte <a href="https://github.com/acacha/adminlte-laravel">adminlte-laravel</a>. I per la part de client he utilitzat la plantilla vue-material
+							<a href="https://vuematerial.github.io/#/">Vue Material</a> amb el següent tema:</p>
+						<pre><code>
+Vue.material.registerTheme('manel', {
+  primary: {
+    color: 'red',
+    hue: 700
+  },
+  accent: 'black',
+  warn: 'red',
+  background: {
+    color: 'blue',
+    hue: 300
+  }
+})
+						</code></pre>
+					</section>
+					<section>
+						<h3>Programació de formularis</h3>
+						<p>Per la part d'administració uso el paquet <a href="https://www.npmjs.com/package/acacha-forms">Acacha Forms</a> per al formulari de registre i per la part de client uso un stepper del Vuetify.js amb camps inputs que desprès de cada pas és guarden a la base de dades.</p>
+
+						<p>Steper amb camps input dins que al apretar a següent ho guarda a la base de dades gràcies al
+							<a href="https://github.com/acacha/stateful-eloquent">stateful-eloquent</a>.
+							Al finalitzar la matrícula et salta un alert que quant apretes a enviar et porta directament a la taula d'enrollments teua on pots veure-hi els estats</p>
+					</section>
+					<section>
+						<h3>Formulari Registre Admin</h3>
+						<pre><code>
+<template>
+    <form method="post" @submit.prevent="submit" @keydown="form.errors.clear($event.target.name)">
+        <div class="form-group has-feedback" :class="{ 'has-error': form.errors.has('name') }">
+
+            <!-- WET -->
+            <input type="text" class="form-control" placeholder="Your name here" name="name" value="" v-model="form.name" autofocus/>
+
+            <span class="glyphicon glyphicon-user form-control-feedback"></span>
+            <transition name="bounce"
+						enter-active-class="animated bounceIn"
+						leave-active-class="animated bounceOut">
+                <span class="help-block" v-if="form.errors.has('name')" v-text="form.errors.get('name')"></span>
+            </transition>
+
+        </div>
+
+        <div class="form-group has-feedback" :class="{ 'has-error': form.errors.has('email') }">
+            <input type="email" class="form-control" placeholder="Your email here" name="email" value="" v-model="form.email"/>
+            <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+            <transition name="fade">
+                <span class="help-block" v-if="form.errors.has('email')" v-text="form.errors.get('email')"></span>
+            </transition>
+        </div>
+        <div class="form-group has-feedback" :class="{ 'has-error': form.errors.has('password') }">
+            <input type="password" class="form-control" placeholder="Password here" name="password" v-model="form.password"/>
+            <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+            <transition name="fade">
+                <span class="help-block" v-if="form.errors.has('password')" v-text="form.errors.get('password')"></span>
+            </transition>
+        </div>
+        <div class="form-group has-feedback">
+            <input type="password" class="form-control" placeholder="Password here" name="password_confirmation" v-model="form.password_confirmation"/>
+            <transition name="fade">
+                <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+            </transition>
+        </div>
+        <div class="row">
+            <div class="col-xs-7">
+                <label>
+                    <div class="checkbox_register icheck">
+                        <label data-toggle="modal" data-target="#termsModal">
+                            <input type="checkbox" name="terms" v-model="form.terms" class="has-error">
+                            <a href="#" :class="{ 'text-danger': form.errors.has('terms') }">Terms and conditions</a>
+                        </label>
+                    </div>
+                </label>
+            </div>
+            <div class="col-xs-4 col-xs-push-1">
+                <button type="submit" class="btn btn-primary btn-block btn-flat" :disabled="form.errors.any()"><i v-if="form.submitting" class="fa fa-refresh fa-spin"></i> Register</button>
+            </div>
+        </div>
+        <div v-if="form.errors.has('terms')" class="form-group has-feedback" :class="{ 'has-error': form.errors.has('terms') }">
+            <span class="help-block" v-if="form.errors.has('terms')" v-text="form.errors.get('terms')"></span>
+        </div>
+    </form>
+
+</template>
+
+<style>
+    .fade-enter-active, .fade-leave-active {
+		transition: opacity .5s ease;
+	}
+	.fade-enter, .fade-leave-to {
+		opacity: 0;
+	}
+</style>
+
+<script>
+    import Form from 'acacha-forms'
+    export default {
+        mounted() {
+            let form =  new FormData(document.querySelector("form"))
+            this.initialitzeICheck()
+            this.focus()
+        },
+        data: function () {
+            return {
+                form: new Form( { name: '', email: '', password: '', password_confirmation: '', terms: 'check'  } )
+            }
+        },
+        watch: {
+            'form.terms': function (value) {
+                if(value) {
+                    $('input').iCheck('check')
+                } else {
+                    $('input').iCheck('uncheck')
+                }
+            }
+        },
+        methods: {
+            initialitzeICheck() {
+                var component = this
+                $('input').iCheck({
+                    checkboxClass: 'icheckbox_square-blue',
+                    radioClass: 'iradio_square-blue',
+                    increaseArea: '20%'
+                }).on('ifChecked', function(event){
+                    component.form.set('terms','check')
+                    component.form.errors.clear('terms')
+                }).on('ifUnchecked', function(event){
+                    component.form.set('terms','')
+                });
+            },
+            submit() {
+                this.form.post('/register')
+                    .then( response => {
+                    console.log('REGISTER OK!!!!!!!!!!!!!!')
+                console.log(response.redirect)
+                console.log(response.status)
+                console.log(response.data)
+                this.redirect(response)
+            })
+            .catch( error => {
+                })
+            },
+            redirect(response) {
+                window.location.reload()
+            }
+        }
+    }
+</script>
+						</code></pre>
+						<img src="images/admin-form.png" alt="">
+					</section>
+					<section>
+						<h3>Formulari Matrícula Client</h3>
+						<pre><code>
+<v-stepper-step step="5" v-bind:complete="e6 > 5">Formative Units</v-stepper-step>
+  <v-stepper-content step="5">
+	<v-card class="grey lighten-4 elevation-0">
+	  <v-flex xs3>
+		<v-list>
+		  <v-list-item v-for="submodule in submodules" :key="submodule">
+			<v-list-tile avatar>
+			  <v-list-tile-action>
+				<v-checkbox v-model="submodule.selected"></v-checkbox>
+			  </v-list-tile-action>
+			  <v-list-tile-content>
+				<v-list-tile-title>{{ submodule.name }}</v-list-tile-title>
+				<v-list-tile-sub-title>{{ submodule.module.name}}</v-list-tile-sub-title>
+			  </v-list-tile-content>
+			</v-list-tile>
+		  </v-list-item>
+		</v-list>
+	  </v-flex>
+	</v-card>
+	<v-btn flat @click.native="e6 = 4">Back</v-btn>
+	<v-layout row justify-center>
+	  <v-dialog v-model="dialog">
+		<v-btn primary light slot="activator">Finish</v-btn>
+		<v-card>
+		  <v-card-row>
+			<v-card-title>Send enrollment?</v-card-title>
+		  </v-card-row>
+		  <v-card-row>
+			<v-card-text>You will get a notification when your enrollment is approved.</v-card-text>
+		  </v-card-row>
+		  <v-card-row actions>
+			<v-btn class="green--text darken-1" flat="flat" @click.native="dialog = false">Cancel</v-btn>
+			<v-btn class="green--text darken-1" flat="flat" @click.native="sendEnrollment()">Send</v-btn>
+		  </v-card-row>
+		</v-card>
+	  </v-dialog>
+	</v-layout>
+  </v-stepper-content>
+</v-stepper>
+						</code></pre>
+						<img src="images/frontend-form.png" alt="">
+					</section>
+					<section>
+						<h3>Components gràfics utilitzats. Client</h3>
+						<p>Usats per l'aplicació client i extrets del Vuetifyjs:</p>
+						<ul>
+							<li>Stepper (Wizard Mobile)</li>
+							<li>Lists</li>
+							<li>Cards</li>
+							<li>Modals</li>
+							<li>Buttons</li>
+							<li>Text Fields</li>
+							<li>Datatable(amb buscador temps real, paginació, possibilitat d'editar.</li>
+							<li>Alerts</li>
+							<li>Footer</li>
+							<li>Menus</li>
+							<li>Sidebar</li>
+							<li>Header</li>
+							<li>Icons</li>
+							<li>Selects</li>
+							<li>Toolbars</li>
+						</ul>
+					</section>
+					<section>
+						<h3>Components gràfics utilitzats. Servidor</h3>
+						<p>Usats web i extrets de la plantilla adminlte2 (més importants):</p>
+						<ul>
+							<li>Cards</li>
+							<li>Charts(de chart js)</li>
+							<li>Tables</li>
+							<li>Widgets del dashboard</li>
+						</ul>
+						<p>Codi chartjs exemple:</p>
+						<pre><code>
+<div class="col-md-12">
+	<chart
+			:labels="{{ $labels1 }}"
+			:values="{{ $values1 }}"
+	></chart>
+</div>
+						</code></pre>
+						<pre><code>
+render() {
+	let data = {
+		labels: this.dataLabels ,
+		datasets: [
+			{
+				label: "My First dataset",
+				fill: false,
+				lineTension: 0.1,
+				backgroundColor: this.color,
+				borderColor: "rgba(75,192,192,1)",
+				borderCapStyle: 'butt',
+				borderDash: [],
+				borderDashOffset: 0.0,
+				borderJoinStyle: 'miter',
+				pointBorderColor: "rgba(75,192,192,1)",
+				pointBackgroundColor: "#fff",
+				pointBorderWidth: 1,
+				pointHoverRadius: 5,
+				pointHoverBackgroundColor: "rgba(75,192,192,1)",
+				pointHoverBorderColor: "rgba(220,220,220,1)",
+				pointHoverBorderWidth: 2,
+				pointRadius: 1,
+				pointHitRadius: 10,
+				data: this.dataValues,
+				spanGaps: false,
+			}
+		]
+	};
+	console.log(this.$children)
+	let context = this.$refs.canvas.getContext('2d')
+	let chart= new Chart(context, {
+		type: 'bar',
+		data: data
+	})
+	this.legend = chart.generateLegend()
+}
+						</code></pre>
+					</section>
 				</section>
 				<section>
 					<h1>Informes, reports i gràfiques</h1>
@@ -1260,6 +1540,16 @@ return $this->transformer->transform($enrollment);
 							<li>https://github.com/spatie/laravel-permission</li>
 							<li>https://github.com/andersao/l5-repository</li>
 							<li>https://github.com/acacha/l5-repository</li>
+							<li>https://adminlte.io/themes/AdminLTE/index2.html</li>
+							<li>https://github.com/acacha/adminlte-laravel</li>
+							<li>https://vuematerial.github.io/#/</li>
+							<li>https://www.npmjs.com/package/acacha-forms</li>
+							<li>https://github.com/acacha/forms</li>
+							<li>https://github.com/acacha/stateful-eloquent</li>
+							<li>https://packagist.org/packages/acacha/stateful-eloquent</li>
+							<li>http://www.chartjs.org/</li>
+							<li>https://github.com/chartjs</li>
+
 						</ul>
 					</section>
 				</section>
