@@ -826,25 +826,16 @@ public function destroy(EnrollmentDeleteRequest $request, $id)
 				</section>
 				<section>
 					<section>
-						<h1>Testos unitaris, d'acceptació i d'api</h1>
-					</section>
-					<section>
-						<h3>Testos Api</h3>
-						<p>Testos per comprovar el bon funcionament de la nostra api:</p>
-						<ul>
-							<li>Funcionament del crud.</li>
-							<li>Permissos.</li>
-							<li>Autorització.</li>
-						</ul>
+						<h1>Testos frontend i API</h1>
 					</section>
 					<section>
 						<h3>Testos Frontend</h3>
 						<p>Testos per comprovar bàsicament el bon funcionament dels pdfs. Usant el laravel dusk. I també provem com no podem veure el dashboard si no estem loguejats, que el podem veure quant ho estem i el procès per loguejar-mos usant el dusk.</p>
 					</section>
 					<section>
-						<p>Codi testos Dusk</p>
+						<h3>Codi Testos Dusk</h3>
 						<pre><code>
-							<?php
+<?php
 
 namespace Tests\Browser;
 
@@ -1013,6 +1004,227 @@ public function test_can_view_login()
 						<h3>Login Test 5</h3>
 						<p>Aqui es tanca l'aplicació i és pot veure que totes les assertions han sigut correcte i els testos han funcionat al 100%.</p>
 						<img src="images/dusk5.png" alt="">
+					</section>
+
+					<section>
+						<h3>Testos Api</h3>
+						<p>Testos per comprovar el bon funcionament de la nostra api:</p>
+						<ul>
+							<li>Funcionament del crud.</li>
+							<li>Permissos.</li>
+							<li>Autorització.</li>
+							<li>Respostes</li>
+						</ul>
+					</section>
+					<section>
+						<h3>Codi Testos</h3>
+						<pre><code>
+<?php
+
+namespace Tests;
+
+use Manelgavalda\EnrollmentMobileTest\User as User;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Mockery;
+use Scool\EnrollmentMobile\Models\Enrollment;
+use Scool\EnrollmentMobile\Repositories\EnrollmentRepository;
+use Scool\EnrollmentMobile\Repositories\ModuleRepository;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
+
+/**
+ * Class EnrollmentsControllerTest
+ */
+class EnrollmentsControllerTest extends BrowserKitTest
+{
+
+    use DatabaseMigrations;
+
+    //S'executa al començar els testos.
+    protected $repository;
+
+
+    public function construct()
+    {
+        $this->repository= Mockery::mock(EnrollmentRepository::class);
+    }
+
+    //S'executa al finalitzar els testos
+    public function tearDown()
+    {
+        Mockery::close();
+    }
+
+    protected function normalLogin()
+    {
+        $normalUser = factory(User::class)->create();
+        $this->actingAs($normalUser);
+    }
+
+    protected function adminLogin()
+    {
+        Permission::create(['name' => 'browse enrollments']);
+        Permission::create(['name' => 'read enrollments']);
+        Permission::create(['name' => 'edit enrollments']);
+        Permission::create(['name' => 'add enrollments']);
+        Permission::create(['name' => 'delete enrollments']);
+        $role = Role::create(['name' => 'manage enrollments']);
+        $role->givePermissionTo('browse enrollments');
+        $role->givePermissionTo('read enrollments');
+        $role->givePermissionTo('edit enrollments');
+        $role->givePermissionTo('add enrollments');
+        $role->givePermissionTo('delete enrollments');
+
+        $adminUser = factory(User::class)->create();
+        $this->actingAs($adminUser->assignRole("manage enrollments"));
+
+    }
+
+
+    public function testIndexNotLogged()
+    {
+        $this->get('enrollments');
+        $this->assertRedirectedTo('login');
+
+    }
+
+    private function createDummyEnrollments()
+    {
+
+        $enrollment1 = new Enrollment();
+        $enrollment2 = new Enrollment();
+        $enrollment3 = new Enrollment();
+        $enrollments = [
+            $enrollment1,
+            $enrollment2,
+            $enrollment3,
+        ];
+        return collect($enrollments);
+    }
+    /**
+     * User without redirect to login.
+     * @group failing
+     * @return void
+     */
+    public function testIndexWithoutUser()
+    {
+
+        $this->app->instance(EnrollmentRepository::class, $this->repository);
+        $this->call('GET', 'enrollments');
+
+        //Redirect.
+        $this->assertResponseStatus(302);
+    }
+
+    /**
+     * User without permission see unauthorized.
+     * @group failing
+     * @return void
+     */
+    public function testIndexWithoutPermission()
+    {
+        //Fase 1 : preparació -> isolation/mocking
+        $this->normalLogin();
+
+        $this->app->instance(EnrollmentRepository::class, $this->repository);
+        $this->call('GET', 'enrollments');
+
+        //Unauthorized.
+        $this->assertResponseStatus(403);
+    }
+
+    /**
+     * User with permission can login.
+     * @group failing
+     * @return void
+     */
+    public function testIndexWithPermission()
+    {
+        //Fase 1 : preparació -> isolation/mocking
+        $this->adminLogin();
+
+        $this->app->instance(ModuleRepository::class, $this->repository);
+        $this->call('GET', 'modules');
+        $this->assertResponseOk();
+        $this->assertViewHas('modules');
+
+        $modules = $this->response->getOriginalContent()->getData()['modules'];
+
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $modules);
+    }
+
+    /**
+     * Store modules with permission can login.
+     * @group failing
+     * @return void
+     */
+    public function testStore()
+    {
+        $this->normalLogin();
+
+
+        $this->call('GET', 'modules');
+
+        $this->post('modules');
+
+        $modules = $this->response->getOriginalContent();
+
+        $this->assertEquals(count($modules),1);
+    }
+
+    /**
+     * Delete modules with permission can login.
+     * @group failing
+     * @return void
+     */
+    public function testDelete()
+    {
+        $this->normalLogin();
+
+
+        $this->call('GET', 'modules');
+
+        $this->delete('modules');
+
+        $modules = $this->response->getOriginalContent();
+
+        $this->assertEquals(count($modules),1);
+    }
+
+    /**
+     * User without permission see unauthorized.
+     * @group failing
+     * @return void
+     */
+    public function nonLogedUserCantSeeDashboard()
+    {
+        //Fase 1 : preparació -> isolation/mocking
+        $this->app->instance(EnrollmentRepository::class, $this->repository);
+        $this->call('GET', 'home');
+        $this->assertResponseStatus(403);
+    }
+
+    /**
+     * User without permission see unauthorized.
+     * @group failing
+     * @return void
+     */
+    public function logedUserCanSeeDashboard()
+    {
+        //Fase 1 : preparació -> isolation/mocking
+        $this->normalLogin();
+
+        $this->app->instance(EnrollmentRepository::class, $this->repository);
+        $this->call('GET', 'home');
+        $this->assertResponseOk();
+    }
+}
+						</code></pre>
+					</section>
+					<section>
+						<h3>Resultat</h3>
+						<p>En aquesta captura podem veure tant el resultat dels testos api com els del dusk ja que el fitxer phpunit el tinc configurat perquè s'executin els 2 alhora. En el test provo diverses operacions de crud amb usuaris sense autenticar, autenticats sense permissos i autenticats en permissos.</p>
+						<img src="images/api-test.png" height="400" alt="">
 					</section>
 				</section>
 				<section>
@@ -1486,11 +1698,6 @@ return $this->transformer->transform($enrollment);
 						<h3>Comunicació entre components</h3>
 						<p>Aqui podem veure un exemple del component Full(Sidebar, Header i Footer) que és comunica amb el component que estem veient(Home) i que conté un altre component per les datatables.</p>
 						<img src="images/components.png" height="600" alt="">
-					</section>
-					<section>
-						<h3>Testos Javascript (Dusk)</h3>
-						<p>Exemple de testos en l'aplicació admin per comprovar el bon funcionament dels pdf amb usuari logats.</p>
-						<h1>Exemple</h1>
 					</section>
 					<section>
 						<h3>Plantilles utilitzades</h3>
@@ -2242,13 +2449,13 @@ class AppServiceProvider extends ServiceProvider
 							<li>https://github.com/acacha/adminlte-laravel</li>
 							<li>https://vuematerial.github.io/#/</li>
 							<li>https://www.npmjs.com/package/acacha-forms</li>
-							<li>https://github.com/acacha/forms</li>
-							<li>https://github.com/acacha/stateful-eloquent</li>
-							<li>https://packagist.org/packages/acacha/stateful-eloquent</li>
 						</ul>
 					</section>
 					<section>
 						<ul>
+							<li>https://github.com/acacha/forms</li>
+							<li>https://github.com/acacha/stateful-eloquent</li>
+							<li>https://packagist.org/packages/acacha/stateful-eloquent</li>
 							<li>http://www.chartjs.org/</li>
 							<li>https://github.com/chartjs</li>
 							<li>https://github.com/barryvdh/laravel-dompdf</li>
