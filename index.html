@@ -1757,17 +1757,140 @@ protected $listen = [
 						<h3>Notificacions</h3>
 						<p>Aqui tinc el codi que fa funcionar l'enviament de restaurar contrasenya desde l'email.</p>
 						<pre><code>
-public function toMail($notifiable)
+<?php
+
+namespace Manelgavalda\EnrollmentMobileTest\Notifications;
+
+use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\Notification;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\MailMessage;
+
+class ResetPassword extends Notification implements ShouldQueue
 {
-	return (new MailMessage)->markdown('mails.resetpass');
+    use Queueable;
+
+    /**
+     * Public token for user class.
+     */
+    public $token;
+
+    /**
+     * ResetPassword constructor.
+     * @param $token
+     */
+    public function __construct($token)
+    {
+        $this->token = $token;
+    }
+
+
+    public function via($notifiable)
+    {
+        return ['mail'];
+    }
+
+    public function toMail($notifiable)
+    {
+        $url = 'password/reset/' . $this->token;
+
+        return (new MailMessage)
+        ->markdown('mails.resetpassword', ['url' => $url])
+        ->subject('Enrollment Mobile Password Reset');
+    }
+
+    /**
+     * Get the array representation of the notification.
+     *
+     * @param  mixed  $notifiable
+     * @return array
+     */
+    public function toArray($notifiable)
+    {
+        return [
+            //
+        ];
+    }
+
+
 }
 						</code></pre>
 					</section>
 					<section>
 						<h3>Ús de caché</h3>
-						<h3>Treball amb fitxers</h3>
-						<h3>Treball amb línia de comandes (artisan)</h3>
-						<h3>Sheduler</h3>
+						<p>Retornant caché guardat amb una key enrollments i amb una duració de 5 minuts i una vegada acabada tornarà a fer la consulta a la bd per agafar els enrollments.</p>
+						<pre><code>
+public function enrollments_view()
+{
+	Cache::put('enrollments',Enrollment::all(), 5);
+	return view('pdf.enrollments')->with('enrollments', Cache::get('enrollments'));
+}
+						</code></pre>
+						<p>Uso el cache que ve per defecte amb laravel (file). D'aquqesta forma l'activem</p>
+						<pre><code>
+➜  enrollment_mobile_test git:(master) ✗ php artisan config:cache
+Configuration cache cleared!
+Configuration cached successfully!
+➜  enrollment_mobile_test git:(master) ✗
+						</code></pre>
+						Codi cache.php:
+						<code><pre>
+	'default' => env('CACHE_DRIVER', 'file'),
+						</pre></code>
+					</section>
+					<section>
+						<h3>Cache 2</h3>
+					<p>La segona vegada que recarguem la pàgina no ens executarà la consulta dels enrolments i l'agafarà del cache per tant els canvis a la bd fet durant els 5 minuts no els veurem.</p>
+					<img src="images/cache2.png" alt="">
+					</section>
+					<section>
+						<h3>Comandes artisan</h3>
+						<p>Exemple de comanda artisan que hem crea un enrollment bàsic (útil per si hem pasa algo amb l'enrollment i no vul executar el seeder).</p>
+						Codi comanda i registre al kernel:
+						<pre><code>
+<?php
+
+namespace Manelgavalda\EnrollmentMobileTest\Providers;
+
+use Illuminate\Support\ServiceProvider;
+use Laravel\Dusk\DuskServiceProvider;
+
+class AppServiceProvider extends ServiceProvider
+{
+    /**
+     * Bootstrap any application services.
+     *
+     * @return void
+     */
+    public function boot()
+    {
+        //
+    }
+
+    /**
+     * Register any application services.
+     *
+     * @return void
+     */
+    public function register()
+    {
+        if ($this->app->environment('local', 'testing')) {
+            $this->app->register(DuskServiceProvider::class);
+        }
+        echo 'Enrollment Created';
+    }
+}
+						</code></pre>
+						<pre><code>
+	protected $commands = [
+        Commands\RandomEnrollment::class
+    ];
+						</code></pre>
+					</section>
+					<section>
+						<h3>Comandes artisan 2</h3>
+						<p>Aqui podem veure el resultat (error causat per no registar la comanda al kernel, i desprès li afegeixo un echo per tindre informació al acabar):</p>
+						<img src="images/artisan.png" alt="">
 					</section>
 				</section>
 				<section>
