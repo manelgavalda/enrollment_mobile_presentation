@@ -109,9 +109,6 @@ components Vuetify.
 
 					</section>
 					<section>
-						<h3>Separation of Concerns</h3>
-					</section>
-					<section>
 						<h3>Rutes Web/Api</h3>
 						<p>Podem veure que tots els models funcionen a partir de rutes resource i per tant és creen  les routes d'un CRUD (CREATE, RETRIEVE, UPDATE, DELETE).
 						Per les rutes web utilitzarem un GET amb el middleware de web i una vegada dins el mètode index del control·lador ens diferenciarà si volem una petició web o api.</p>
@@ -895,6 +892,34 @@ The MIT License (MIT). Please see [License File](LICENSE.md) for more informatio
 [link-google-play]: http://play.google.com/
 [link-presentation]: https://manelgavalda.github.io/enrollment_mobile_presentation/#/
 						</section>
+					</section>
+					<section>
+						<h3>Scrutinizer</h3>
+						<p>Scrutinizer és una eina de CI molt important per control·lar la qualitat del projecte ja que ens mira si el codi fa pudor (code smells), mirant codi repetit, bones pràctiques, etc...</p>
+						<pre><code>
+Class		Interval
+very good	[8, 10]
+good		[6, 8)
+satisfactory	[4, 6)
+pass		[2, 4)
+critical	[0, 2)
+							</code></pre>
+						<img src="images/scrutinizer.png" alt="">
+					</section>
+					<section>
+						<h3>Travis</h3>
+						<p>Eina que ens vigila que els testos segueixin funcionant al fer canvis a la nostra aplicació i pujar-la.</p>
+						<img src="images/travis.png" alt="">
+					</section>
+					<section>
+						<h3>StyleCI</h3>
+						<p>Eina que ens dirà si el nostre codi segueix l'estil de codi php estàndard(espais, tabulacions, etc...) i ens ajudarà a solucionar-ho mitjançant pull-requests.</p>
+						<img src="images/styleci.png" height="600" alt="">
+					</section>
+					<section>
+						<h3>Packagist</h3>
+						<p>Repositori principal de laravel i que el composer fa servir per instal·lar paquets, útil ja que et deixarà fer un control de versions senzill i et donarà informació sobre l'estat i descarges del teu paquet.</p>
+						<img src="images/packagist2.png" height="550" alt="">
 					</section>
 				</section>
 				<section>
@@ -1779,6 +1804,7 @@ public function toMail($notifiable)
 							<li>https://github.com/barryvdh/laravel-dompdf</li>
 							<li>https://laravel.com/docs/5.4/eloquent-relationships#eager-loading</li>
 							<li>https://pusher.com/</li>
+							<li>https://scrutinizer-ci.com/g/manelgavalda/enrollment_mobile/</li>
 						</ul>
 					</section>
 				</section>
