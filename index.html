@@ -1679,14 +1679,71 @@ methods: {
 					</section>
 				</section>
 				<section>
-					<h1>Altres</h1>
-					<h3>Email</h3>
-					<h3>Ús d'esdeveniments</h3>
-					<h3>Ús de caché</h3>
-					<h3>Treball amb fitxers</h3>
-					<h3>Treball amb línia de comandes (artisan)</h3>
-					<h3>Sheduler</h3>
-					<h3>Notificacions</h3>
+					<section>
+						<h1>Altres</h1>
+					</section>
+					<section>
+						<h3>Email</h3>
+						<p>En aquest cas usat per fer un reset de la contrasenya. Per fer-ho crearem una nova blade amb l'estrucura de l'email que voldrem veure email (amb markdown HTML5).</p>
+						<pre><code>
+@component('mail::message')
+
+    # Hello!
+
+    Reset Password for Enrollment Mobile Application. Restore Password Application:
+
+    @component('mail::button', ['url' => $url])
+        Reset Password
+    @endcomponent
+
+    Thanks, Manel Gavaldà Andreu
+@endcomponent
+						</code></pre>
+						<img src="images/reset.png" height="320" alt="">
+					</section>
+					<section>
+						<h3>Email 2</h3>
+						<p>Una vegada hem introduït l'email apretarem el botó i ens arribarà el següent correu per restaurar la contrasenya desde un formulari bàsic de l'aplicació.</p>
+						<img src="images/email.png" height="620" alt="">
+					</section>
+					<section>
+						<h3>Ús d'esdeveniments</h3>
+						<p>El laravel disposa d'un esdeveniment que es dispara al registar un nou usuari(NewRegisteredUser), i que jo faig servir per donar permissos a la meua aplicació als usuaris que es registrin.</p>
+						<pre><code>
+public function handle(NewRegisteredUserEvent $event)
+{
+	$event->user->assignRole("manage enrollments");
+}
+						</code></pre>
+						I dins el nostre EventServiceProvider definir el listener amb el seu event.
+						<pre><code>
+protected $listen = [
+	'Manelgavalda\EnrollmentMobileTest\Events\SomeEvent' => [
+		'Manelgavalda\EnrollmentMobileTest\Listeners\EventListener',
+	],
+	'Manelgavalda\EnrollmentMobileTest\Events\NewRegisteredUserEvent' => [
+		'Manelgavalda\EnrollmentMobileTest\Listeners\GrantPermissionsListener',
+	]
+
+];
+						</code></pre>
+					</section>
+					<section>
+						<h3>Notificacions</h3>
+						<p>Aqui tinc el codi que fa funcionar l'enviament de restaurar contrasenya desde l'email.</p>
+						<pre><code>
+public function toMail($notifiable)
+{
+	return (new MailMessage)->markdown('mails.resetpass');
+}
+						</code></pre>
+					</section>
+					<section>
+						<h3>Ús de caché</h3>
+						<h3>Treball amb fitxers</h3>
+						<h3>Treball amb línia de comandes (artisan)</h3>
+						<h3>Sheduler</h3>
+					</section>
 				</section>
 				<section>
 					<section>
