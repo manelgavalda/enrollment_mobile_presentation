@@ -1464,7 +1464,15 @@ Vue.material.registerTheme('manel', {
 							<li>Tables</li>
 							<li>Widgets del dashboard</li>
 						</ul>
-						<p>Codi chartjs exemple:</p>
+					</section>
+				</section>
+				<section>
+					<section>
+						<h1>Gràfiques, informes i temps real</h1>
+					</section>
+					<section>
+						<h3>Gràfiques</h3>
+						<p>Codi chartjs exemple, Crida desde el component vue on tenim el codi i en el qual ens comuniquem per daonr-li dades. Invocació:</p>
 						<pre><code>
 <div class="col-md-12">
 	<chart
@@ -1473,6 +1481,7 @@ Vue.material.registerTheme('manel', {
 	></chart>
 </div>
 						</code></pre>
+						<p>Component vue.</p>
 						<pre><code>
 render() {
 	let data = {
@@ -1512,9 +1521,111 @@ render() {
 }
 						</code></pre>
 					</section>
-				</section>
-				<section>
-					<h1>Informes, reports i gràfiques</h1>
+					<section>
+						<h3>Gràfiques 2</h3>
+						<p> Control·lador que usem per omplir el gràfic i comunicació entre components vue. Control·lador:</p>
+						<pre><code>
+public function index()
+{
+	$data = [];
+	$data['labels1'] = "['January', 'February', 'March', 'April', 'May', 'June', 'July']";
+	$data['values1'] = "[10, 2, 4, 23, 43, 54]";
+	$data['labels2'] = "['January', 'February', 'March', 'April', 'May', 'June', 'July']";
+	$data['values2'] = "[10, 42, 4, 23, 43, 54]";
+	return view('enrollment_mobile::dashboard.dashboard', $data);
+}
+						</code></pre>
+<p>Comunicació entre components vue. Utilitzant props.</p>
+						<pre><code>
+props: {
+	labels: {
+		type: Array,
+		default_values: ['January', 'February', 'March', 'April', 'May', 'June', 'July']
+	},
+	values: {
+		type: Array,
+		default_values: [10, 42, 4, 23, 43, 54]
+	},
+	url : {
+		type: String
+	}
+}
+						</code></pre>
+					</section>
+					<section>
+						<h3>Gràfiques 3</h3>
+						<p>Comunicació vía props usant vue.</p>
+						<img src="images/chart.png" alt="">
+					</section>
+					<section>
+						<h3>Informes</h3>
+						<p>Codi de rutes.</p>
+						<pre><code>
+Route::get('enrollment/pdf/{id}', 'PdfController@enrollment');
+
+Route::get('enrollmentspdf/pdf', 'PdfController@enrollments');
+
+Route::get('enrollmentspdf/view', 'PdfController@enrollments_view');
+						</code></pre>
+						<p>Codi control·lador. Usant el paquet <a href="https://github.com/barryvdh/laravel-dompdf">laravel-dompdf</a> per crear pdf a partir de HTML simple.</p>
+						<pre><code>
+public function enrollments()
+{
+	$enrollments = Enrollment::all();
+	$pdf = App::make('dompdf.wrapper');
+	$view = View::make('pdf.enrollments')->with('enrollments', $enrollments)->render();
+	$pdf->loadHTML($view);
+	return $pdf->stream('enrollments');
+}
+
+public function enrollments_view()
+{
+	$enrollments = Enrollment::all();
+	return view('pdf.enrollments')->with('enrollments', $enrollments);
+}
+						</code></pre>
+					</section>
+					<section>
+						<h3>Informes 2</h3>
+						<p>Llistat d'enrollments vía pdf.</p>
+						<img src="images/pdf.png" alt="">
+						<img src="images/pdf-view.png" alt="">
+					</section>
+					<section>
+						<h3>Temps real</h3>
+						<p>Codi perquè funcioni el temps real i per això necessitem el <a href="https://pusher.com/">pusher</a> que la rebre un event ens executarà l'acció que ens interesa(incrementar enrollments).</p>
+						<pre><code>
+	this.$echo.channel('dashboard').listen(this.eventName(), (payload) => {
+	  console.log('Event received!!!!!!!!!')
+	  console.log(payload);
+	  this.value++
+	});
+},
+methods: {
+	eventName() {
+		return "\\Scool\\EnrollmentMobile\\Events\\" +voca.capitalize(pluralize.singular(this.name))+'Created'
+	},
+	dashboardValue (name) {
+		var component = this
+		axios.get('/dashboard/' + name + '/number')
+		  .then(function (response) {
+			console.log(response.data)
+			component.value = response.data
+			  component.name = window.pluralize(component.name)
+		  })
+		  .catch(function (error) {
+			console.log(error)
+		  });
+	},
+}
+						</code></pre>
+						<p>Necessitarem indicar les nostres dades del pusher (api-key, server-key, etc...)</p>
+					</section>
+					<section>
+						<h3>Temps real 2</h3>
+						<p>Exemple al dashboard mostrant les matrícules en temps real.</p>
+						<img src="images/real-time.png" alt="">
+					</section>
 				</section>
 				<section>
 					<h1>Altres</h1>
@@ -1551,9 +1662,15 @@ render() {
 							<li>https://github.com/acacha/forms</li>
 							<li>https://github.com/acacha/stateful-eloquent</li>
 							<li>https://packagist.org/packages/acacha/stateful-eloquent</li>
+						</ul>
+					</section>
+					<section>
+						<ul>
 							<li>http://www.chartjs.org/</li>
 							<li>https://github.com/chartjs</li>
-
+							<li>https://github.com/barryvdh/laravel-dompdf</li>
+							<li>https://laravel.com/docs/5.4/eloquent-relationships#eager-loading</li>
+							<li>https://pusher.com/</li>
 						</ul>
 					</section>
 				</section>
