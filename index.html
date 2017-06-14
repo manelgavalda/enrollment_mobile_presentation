@@ -839,11 +839,180 @@ public function destroy(EnrollmentDeleteRequest $request, $id)
 					</section>
 					<section>
 						<h3>Testos Frontend</h3>
-						<p>Testos per comprovar bàsicament el bon funcionament dels pdfs. Usant el laravel dusk</p>
-						<ul>
-							<li>Veus el que tendries que veure.</li>
-							<li>Entres a l'aplicació abans de comprovar-ho.</li>
-						</ul>
+						<p>Testos per comprovar bàsicament el bon funcionament dels pdfs. Usant el laravel dusk. I també provem com no podem veure el dashboard si no estem loguejats, que el podem veure quant ho estem i el procès per loguejar-mos usant el dusk.</p>
+					</section>
+					<section>
+						<p>Codi testos Dusk</p>
+						<pre><code>
+							<?php
+
+namespace Tests\Browser;
+
+use Manelgavalda\EnrollmentMobileTest\User;
+use Scool\EnrollmentMobile\Models\Enrollment;
+use Tests\DuskTestCase;
+use Laravel\Dusk\Browser;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
+
+class PdfControllerTest extends DuskTestCase
+{
+    //les sqlite en memòria no funcionen amb el dusk ja que s'executen desde el navegador.
+    use DatabaseMigrations;
+    /**
+     * Test enrollments are converted to pdf correctly.
+     *
+     * @return void
+     * @group failing
+     */
+    public function test_users_are_converted_to_pdf_correctly()
+    {
+        $this->browse(function (Browser $browser) {
+            $browser->visit('/enrollmentspdf/pdf');
+//                      ->pause(500000);
+//                    ->assertSee('html');
+            //No puc comprovar pdf.
+        });
+    }
+
+    /**
+     * Test user is converted to pdf correctly.
+     * @return void
+     * @group failing
+     */
+    public function test_enrollment_is_converted_to_pdf_correctly()
+    {
+        $this->browse(function (Browser $browser) {
+            $browser->visit('/enrollment/pdf/1')
+                ->assertSee('todo');
+        });
+    }
+
+    /**
+     * Test user is converted to pdf correctly.
+     * @return void
+     * @group failing
+     */
+    public function test_enrollment_is_shown_correctly()
+    {
+        $enrollment = $this->createEnrollments();
+
+        $this->browse(function (Browser $browser) use ($enrollment) {
+            $browser->visit('/enrollment/pdf/' . $enrollment->id)
+                ->assertSee('todo');
+        });
+    }
+
+    /**
+     * Test user is converted to pdf correctly.
+     * @return void
+     */
+//    public function test_users_are_shown_correctly()
+//    {
+//
+//        $enrollments = $this->createEnrollments(25);
+//
+//        dump($enrollments[0]->name);
+//        $this->browse(function (Browser $browser) use ($enrollments){
+//            $browser->visit('enrollmentspdf/view')
+//            ->assertTitle('Enrollments List')
+//            ->assertSee($enrollments[0]->name);
+//
+//            // Funciona amb css selectors.
+//            $this->assertEquals(3,count($browser->elements('div#enrollments-list table#enrollments-tablelist tr th')));
+//            $this->assertEquals(26,count($browser->elements('div#enrollments-list table#enrollments-tablelist tr')));
+//        });
+//    }
+
+public function test_can_view_login()
+{
+    $this->browse(function (Browser $browser) {
+        $browser->visit('/login')
+//                ->pause(50000)
+            ->assertPathIs('/login');
+//            ->assertSee(' Sign in to start your session ');
+    });
+}
+
+    /**
+     * Test cant view dashboard without login.
+     * @return void
+     * @group failing
+     */
+    public function test_can_view_dashboard_without_login()
+    {
+
+        $this->browse(function (Browser $browser) {
+            $browser->visit('/home')
+//                ->pause(50000)
+                ->assertPathIs('/login');
+        });
+    }
+
+    /**
+     * Test can view dashboard with login.
+     * @return void
+     * @group failing
+     */
+    public function test_can_view_dashboard_when_login()
+    {
+        $user = factory(User::class)->create([
+            'name' => 'Manel Gavaldà',
+            'email' => 'dusklogin@iesebre.com'
+        ]);
+
+        $this->browse(function (Browser $browser)  use ($user) {
+            $browser->visit('/home')
+                ->assertPathIs('/login')
+                ->pause(10000)
+                ->type('email', $user->email)
+                ->pause(10000)
+                ->type('password', 'secret')
+                ->pause(10000)
+                ->press('Sign In')
+                ->pause(10000)
+                ->assertPathIs('/home')
+                ->pause(10000)
+                ->assertSee('Dashboard')
+                ->pause(10000)
+                ->assertSee('Enrollment')
+                ->pause(10000)
+                ->assertSee('Manel Gavaldà');
+        });
+    }
+
+    private function createEnrollments($num = null)
+    {
+        return factory(Enrollment::class, $num)->create();
+    }
+}
+
+						</code></pre>
+					</section>
+					<section>
+						<h3>Login Test 1</h3>
+						<p>Visitant la ruta home i comprovant que ens porta al login ja que està protegida.</p>
+						<img src="images/dusk1.png" alt="">
+					</section>
+					<section>
+						<h3>Login Test 2</h3>
+
+						<p>Una vegada dins el login escribim l'email de l'usuari creat més dalt en el camp email.</p>
+						<img src="images/dusk2.png" alt="">
+					</section>
+					<section>
+						<h3>Login Test 3</h3>
+						<p>Escribim la password de l'usuari creat (creat sense password, per tant la password es secret), i apretem el boto Sign In.</p>
+						<img src="images/dusk3.png" alt="">
+					</section>
+					<section>
+						<h3>Login Test 4</h3>
+						<p>Una vegada dins ens fiquem a comprovar les coses més importants de la pàgina. En aquest cas  comprovo que es veigue Manel Gavaldà (nom de l'usuari), Dashboard (nom de la pàgina) i 'Enrollments'.</p>
+						<img src="images/dusk4.png"  height="450" alt="">
+					</section>
+					<section>
+						<h3>Login Test 5</h3>
+						<p>Aqui es tanca l'aplicació i és pot veure que totes les assertions han sigut correcte i els testos han funcionat al 100%.</p>
+						<img src="images/dusk5.png" alt="">
 					</section>
 				</section>
 				<section>
