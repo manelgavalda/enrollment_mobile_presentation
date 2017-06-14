@@ -784,6 +784,18 @@ public function destroy(EnrollmentDeleteRequest $request, $id)
 							<li>Publicat al packagist i afegit els badges per informar del seu funcionament.</li>
 							<li>Penjat al servidor per funcionar amb el paquet de test de forma local (també es podria instal·lar directament afegint-lo al composer.json) ja que el tenim publicat.</li>
 						</ul>
+						<p>Per treballar amb els paquets composer sense necessitat de tindre'ls al packagist he usat el paquet
+							<a href="https://github.com/franzliedke/studio">studio</a></p>
+						<pre><code>
+{
+    "version": 2,
+    "paths": [
+        "../enrollment_mobile",
+        "../stateful-eloquent",
+        "../l5-repository"
+    ]
+}
+						</code></pre>
 					</section>
 					<section>
 						<h3>Paquet test</h3>
@@ -2074,6 +2086,7 @@ class AppServiceProvider extends ServiceProvider
 							<li>https://laravel.com/docs/5.4/eloquent-relationships#eager-loading</li>
 							<li>https://pusher.com/</li>
 							<li>https://scrutinizer-ci.com/g/manelgavalda/enrollment_mobile/</li>
+							<li>https://github.com/franzliedke/studio</li>
 						</ul>
 					</section>
 				</section>
