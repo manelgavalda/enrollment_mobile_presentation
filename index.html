@@ -2609,6 +2609,45 @@ class AppServiceProvider extends ServiceProvider
 						<p>Aqui podem veure el resultat (error causat per no registar la comanda al kernel, i desprès li afegeixo un echo per tindre informació al acabar):</p>
 						<img src="images/artisan.png" alt="">
 					</section>
+					<section>
+						<h3>Estats</h3>
+						<p>Control d'estats de la matrícula amb <a href="https://github.com/acacha/stateful-eloquent">stateful-eloquent</a></p>
+						<pre><code>
+protected $fillable = ['id','name','validated','finished', 'user_id', 'study_id','course_id','classroom_id'];
+
+    protected $states = [
+        'User' => ['initial' => true],
+        'Enrollments',
+        'Study',
+        'Module',
+        'Active',
+        'Submodule' => ['final' => true]
+    ];
+
+    protected $transitions = [
+        'create' => [
+            'from' => 'User',
+            'to' => 'Enrollments'
+        ],
+        'chose_enrollment' => [
+            'from' => 'Enrollments',
+            'to' => 'Study'
+        ],
+        'chose_module' => [
+            'from' => 'Study',
+            'to' => 'Module'
+        ],
+        'chose_submodules' => [
+            'from' => 'Module',
+            'to' => 'Submodule'
+        ],
+        'enrollment_status' => [
+            'from' => 'Submodule',
+            'to' => 'Active'
+        ]
+    ];
+						</code></pre>
+					</section>
 				</section>
 				<section>
 					<section>
@@ -2647,9 +2686,20 @@ class AppServiceProvider extends ServiceProvider
 							<li><a href="https://chrome.google.com/webstore/detail/lighthouse/blipmdconlkpinefehnmjammfjpmpbjk">https://chrome.google.com/webstore/detail/lighthouse/blipmdconlkpinefehnmjammfjpmpbjk</a></li>
 							<li><a href="https://googlechrome.github.io/samples/service-worker/custom-offline-page/">https://googlechrome.github.io/samples/service-worker/custom-offline-page/</a></li>
 							<li><a href="https://laravel.com/docs/5.4/mix">https://laravel.com/docs/5.4/mix</a></li>
+							<li><a href="https://github.com/acacha/stateful-eloquent">https://github.com/acacha/stateful-eloquent</a></li>
 						</ul>
 					</section>
 				</section>
+				<div class="share-reveal" style="font-size: 20px; display: block; position: absolute; bottom: 16px; left: 50%; margin-left: -139px; z-index: 20;">
+
+				<a class="share-reveal-phone" href="http://enrollmentmobile.manelgavalda.sintesi.acacha.org:8080/">
+					Admin &#9745;
+				</a>
+
+				<a class="share-reveal-twitter" href="http://manelgavalda-enrollmentmobilevue.surge.sh">
+					Client &#9745;
+				</a>
+			</div>
 			</div>
 		</div>
 
