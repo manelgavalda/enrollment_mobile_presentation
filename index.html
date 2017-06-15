@@ -10,7 +10,7 @@
 		<link rel="stylesheet" href="css/theme/night.css">
 
 		<!-- Theme used for syntax highlighting of code -->
-		<link rel="stylesheet" href="lib/css/sky.css">
+		<link rel="stylesheet" href="lib/css/zenburn.css">
 
 		<!-- Printing and PDF exports -->
 		<script>
@@ -40,11 +40,12 @@
 					<h1>Referències</h1>
 					<ul>
 						<li><a href="https://manelgavalda.github.io/LandingPage">Landing Page</a></li>
-						<li><a href="http://enrollmentmobile.manelgavalda.sintesi.acacha.org:8080">Admin Demo (User=manelgavalda@iesebre.com Password=123456)</a></li>
-						<li><a href="http://manelgavalda-enrollmentmobilevue.surge.sh/">Client Demo (User=manelgavalda@iesebre.com Password=123456)</a></li>
+						<li><a href="http://enrollmentmobile.manelgavalda.sintesi.acacha.org:8080">Admin Demo</a></li>
+						<li><a href="http://manelgavalda-enrollmentmobilevue.surge.sh/">Client Demo</a></li>
 						<li><a href="https://manelgavalda.github.io/todosBackendApiDocs">Api Documentation</a></li>
 						<li>Github</li>
 						<ul>
+							<li><a href="https://play.google.com/store/apps/details?id=io.todosVue">Google Play Application</a></li>
 							<li><a href="https://github.com/manelgavalda/enrollment_mobile">Composer Package</a></li>
 							<li><a href="https://github.com/manelgavalda/enrollment_mobile_test">Demo Package</a></li>
 							<li><a href="https://github.com/manelgavalda/enrollmentmobilevue">Vue Package</a></li>
@@ -53,14 +54,69 @@
 						<li>Downloads</li>
 						<ul>
 							<li><a href="https://packagist.org/packages/manelgavalda/enrollment_mobile">Packagist</a></li>
-							<li><a href="https://play.google.com/store/apps/details?id=io.todosVue">Google Play Application</a></li>
 						</ul>
 					</ul>
 				</section>
 
 				<section>
-					<h1>Exemple validació de matrícula</h1>
-					<p></p>
+					<section>
+						<h1>Exemple validació de matrícula</h1>
+					</section>
+					<section>
+						<h3>Validació 1</h3>
+						<p>Primerament anem a la nostra aplicació client i entrem dins amb el nostre usuari o en cas de no tindre'l anem a la part d'administració i el creem allí.</p>
+						<img src="images/matricula1.png" alt="">
+					</section>
+					<section>
+						<h3>Validació 2</h3>
+						<p>Un cop dins veiem que ens agafarà les dades del nostre usuari ja que el tenim lligat amb la taula perosn, podem editar-ho. Al fer click a següent és guardarà l'estat de la matrícula.</p>
+						<img src="images/matricula2.png" height="600" alt="">
+					</section>
+					<section>
+						<h3>Validació 3</h3>
+						<p>Seleccionem l'enrollment que volem editar o no seleccionem cap per crear un de nou.</p>
+						<img src="images/matricula3.png" alt="">
+					</section>
+					<section>
+						<h3>Validació 4</h3>
+						<p>Seleccionem el curs.</p>
+						<img src="images/matricula4.png" alt="">
+					</section>
+					<section>
+						<h3>Validació 5</h3>
+						<p>Sel·leccionem els mòduls professionals que ens interessin.</p>
+						<img src="images/matricula5.png" alt="">
+					</section>
+					<section>
+						<h3>Validació 6</h3>
+						<p>Seleccionem les seves UFs.</p>
+						<img src="images/matricula6.png" alt="">
+					</section>
+					<section>
+						<h3>Validació 7</h3>
+						<p>Al finalitzar guardem la matrícula acabada i ens redirigirà a la nostra taula d'enrollments on podrem veure l'estat.</p>
+						<img src="images/matricula.png" alt="">
+					</section>
+					<section>
+						<h3>Validació 8</h3>
+						<p>Un cop aqui podem llistar les nostres matrícules creades.</p>
+						<img src="images/enrollment7.png" alt="">
+					</section>
+					<section>
+						<h3>Validació 9</h3>
+						<p>Desde un usuari admin entrem a l'aplició admin.</p>
+						<img src="images/enrollment8.png" height="600" alt="">
+					</section>
+					<section>
+						<h3>Validació 10</h3>
+						<p>Validem la matrícula</p>
+						<img src="images/enrollment10.png" height="600" alt="">
+					</section>
+					<section>
+						<h3>Validació 11</h3>
+						<p>I desde el client veurem que està validada.</p>
+						<img src="images/enrollment11.png" alt="">
+					</section>
 				</section>
 
 				<section>
@@ -316,8 +372,7 @@ components Vuetify.
 					</section>
 					<section>
 						<h3>Fitxer de rutes</h3>
-						<pre><code>
-
+						<pre><code class="hljs">
 <?php
 use Illuminate\Support\Facades\Auth;
 use Scool\EnrollmentMobile\Models\Enrollment;
@@ -540,8 +595,8 @@ router.beforeEach((to, from, next) => {
 					<section>
 						<h1>Bases de dades</h1>
 						<p>La base de dades funciona amb mysql, i les taules estan creades a partir de les migracions de laravel. Disposo d'una taula per cada model i les relacions les tinc tant als model afectats com a la migració.</p>
-						<pre><code>
-					    public function up()
+						<pre><code class="hljs">
+public function up()
     {
         Schema::create('enrollments', function (Blueprint $table) {
             $table->increments('id'); //obligatori
@@ -625,14 +680,12 @@ $factory->define(Scool\EnrollmentMobile\Models\Enrollment::class, function (Fake
 //        });
 						</code></pre>
 						<p>Relació un a molts (usuari té enrollments) per tant la definirem de la següent forma en els models que afecta.</p>
-						<li>Model Enrollment:</li>
 						<pre><code>
 public function user()
 {
 	return $this->belongsTo(Scool\Foundation\User::class, 'user_id');
 }
 						</code></pre>
-						<li>Model User:</li>
 						<pre><code>
 public function enrollments()
 {
@@ -753,6 +806,7 @@ public function destroy(EnrollmentDeleteRequest $request, $id)
 	return redirect()->back()->with('message', 'Enrollment deleted.');
 }
 						</code></pre>
+						<img src="images/delete.png"  height="400" alt="">
 					</section>
 					<section>
 						<h3>Crud fet amb HTTP</h3>
